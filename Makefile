@@ -1,4 +1,3 @@
-V=20220225
 PREFIX=/usr/local
 
 SCRIPTS=update-vendor-firmware update-grub first-boot
