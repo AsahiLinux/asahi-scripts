@@ -9,6 +9,10 @@ efi_dev=$(findmnt -n -o SOURCE /boot/efi)
 if [ -e "$root_dev" ]; then
     echo "Randomizing root filesystem UUID..."
     tune2fs -U random "$root_dev"
+
+    root_uuid="$(blkid -c /dev/null "$root_dev" -o export | grep '^UUID=')"
+    echo "Root filesystem: $root_uuid"
+    echo
 fi
 
 if [ -e "$efi_dev" ] && \
@@ -19,13 +23,25 @@ if [ -e "$efi_dev" ] && \
     ssize="$(blockdev --getss "$efi_dev")"
     dd bs=1 seek=67 count=4 conv=notrunc if=/dev/urandom of="$efi_dev"
     dd bs=1 skip=67 seek=$((67+6*$ssize)) count=4 conv=notrunc if="$efi_dev" of="$efi_dev"
+
+    efi_uuid="$(blkid -c /dev/null "$efi_dev" -o export | grep '^UUID=')"
+    echo "EFI partition: $efi_uuid"
+    echo
 fi
 
-echo "Regenerating /etc/fstab..."
-genfstab -U / > /etc/fstab
+if [ ! -z "$root_uuid" ] && [ ! -z "$efi_uuid" ]; then
+    echo "Regenerating /etc/fstab..."
+    tee /etc/fstab <<EOF
+$root_uuid / ext4 rw,relatime,x-systemd.growfs 0 1
+$efi_uuid /boot/efi vfat rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,errors=remount-ro    0 2
+EOF
+    echo
+fi
 
 update-grub
 
+echo
 echo "Initializing Pacman keyring..."
 pacman-key --init
 pacman-key --populate archlinuxarm asahilinux
+echo
