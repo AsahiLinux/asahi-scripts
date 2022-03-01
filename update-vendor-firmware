@@ -3,7 +3,7 @@
 
 set -e
 
-VENDORFW=/boot/efi/vendorfw/
+VENDORFW=/boot/efi/vendor-fw/
 TARGET=/lib/firmware/
 TARGET_MANIFEST=".vendorfw.manifest"
 
