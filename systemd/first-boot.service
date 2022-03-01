@@ -1,5 +1,5 @@
 [Unit]
-Description=Initializes Pacman keyring
+Description=Sets up system on first boot
 Before=sshd.service first-boot-complete.target
 Wants=first-boot-complete.target
 ConditionPathIsReadWrite=/etc
@@ -8,8 +8,7 @@ ConditionFirstBoot=yes
 [Service]
 Type=oneshot
 RemainAfterExit=yes
-ExecStart=/usr/bin/pacman-key --init
-ExecStart=/usr/bin/pacman-key --populate archlinuxarm asahilinux
+ExecStart=/usr/bin/first-boot
 
 [Install]
 WantedBy=multi-user.target

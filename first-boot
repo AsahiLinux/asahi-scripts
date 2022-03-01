@@ -1,0 +1,28 @@
+#!/bin/sh
+
+root_dev=$(findmnt -n -o SOURCE /)
+efi_dev=$(findmnt -n -o SOURCE /boot/efi)
+
+if [ -e "$root_dev" ]; then
+    echo "Randomizing root filesystem UUID..."
+    tune2fs -U random "$root_dev"
+fi
+
+if [ -e "$efi_dev" ] && \
+    blkid "$efi_dev" | grep -q 'TYPE="vfat"'; then
+
+    echo "Randomizing EFI system partition UUID..."
+    # Ugly... why isn't there a command to do this?
+    ssize="$(blockdev --getss "$efi_dev")"
+    dd bs=1 seek=67 count=4 conv=notrunc if=/dev/urandom of="$efi_dev"
+    dd bs=1 skip=67 seek=$((67+6*$ssize)) count=4 conv=notrunc if="$efi_dev" of="$efi_dev"
+fi
+
+echo "Regenerating /etc/fstab..."
+genfstab -U / > /etc/fstab
+
+update-grub
+
+echo "Initializing Pacman keyring..."
+pacman-key --init
+pacman-key --populate archlinuxarm asahilinux

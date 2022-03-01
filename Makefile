@@ -1,9 +1,9 @@
 V=20220225
 PREFIX=/usr/local
 
-SCRIPTS=update-vendor-firmware update-grub
-UNITS=pacman-init.service update-vendor-firmware.service systemd-udev-trigger-early.service
-MULTI_USER_WANTS=pacman-init.service
+SCRIPTS=update-vendor-firmware update-grub first-boot
+UNITS=first-boot.service update-vendor-firmware.service systemd-udev-trigger-early.service
+MULTI_USER_WANTS=first-boot.service
 SYSINIT_WANTS=update-vendor-firmware.service systemd-udev-trigger-early.service
 
 install:
