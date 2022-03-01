@@ -1,4 +1,5 @@
 #!/bin/sh
+# SPDX-License-Identifier: MIT
 
 root_dev=$(findmnt -n -o SOURCE /)
 efi_dev=$(findmnt -n -o SOURCE /boot/efi)

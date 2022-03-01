@@ -1,3 +1,5 @@
+# SPDX-License-Identifier: MIT
+
 [Unit]
 Description=Sets up system on first boot
 Before=sshd.service first-boot-complete.target
