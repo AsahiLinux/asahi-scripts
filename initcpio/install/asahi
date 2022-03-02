@@ -1,0 +1,27 @@
+#!/bin/bash
+
+build() {
+    local filter
+
+    # For NVMe
+    add_module apple-mailbox?
+
+    # For USB and HID
+    add_module pinctrl-apple-gpio?
+
+    # For USB
+    map add_module i2c-apple? tps6598x? apple-dart? dwc3? dwc3-of-simple?
+
+    # For HID
+    map add_module spi-apple? spi-hid-apple? spi-hid-apple-of?
+}
+
+help() {
+    cat <<HELPEOF
+This hook adds modules necessary for using Linux on Apple Silicon Macs,
+which are not otherwise included by existing hooks due to being soft
+dependencies.
+HELPEOF
+}
+
+# vim: set ft=sh ts=4 sw=4 et:

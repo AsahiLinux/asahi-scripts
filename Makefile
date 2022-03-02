@@ -15,11 +15,14 @@ install:
 		$(DESTDIR)$(PREFIX)/lib/systemd/system/multi-user.target.wants/
 	ln -sf $(addprefix $(PREFIX)/lib/systemd/system/,$(SYSINIT_WANTS)) \
 		$(DESTDIR)$(PREFIX)/lib/systemd/system/sysinit.target.wants/
+	install -dD $(DESTDIR)$(PREFIX)/lib/initcpio/install
+	install -m0644 -t $(DESTDIR)$(PREFIX)/lib/initcpio/install initcpio/install/asahi
 
 uninstall:
 	rm -f $(addprefix $(DESTDIR)$(PREFIX)/bin/,$(SCRIPTS))
 	rm -f $(addprefix $(DESTDIR)$(PREFIX)/lib/systemd/system/,$(UNITS))
 	rm -f $(addprefix $(DESTDIR)$(PREFIX)/lib/systemd/system/multi-user.target.wants/,$(MULTI_USER_WANTS))
 	rm -f $(addprefix $(DESTDIR)$(PREFIX)/lib/systemd/system/sysinit.target.wants/,$(SYSINIT_WANTS))
+	rm -f $(DESTDIR)$(PREFIX)/lib/initcpio/install/asahi
 
 .PHONY: install uninstall
