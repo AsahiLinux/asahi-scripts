@@ -14,6 +14,10 @@ build() {
 
     # For HID
     map add_module spi-apple? spi-hid-apple? spi-hid-apple-of?
+
+    # For RTC
+    map add_module macsmc? macsmc-rtkit? rtc-macsmc? \
+	    simple-mfd-spmi? spmi-apple-controller? nvmem_spmi_mfd?
 }
 
 help() {
