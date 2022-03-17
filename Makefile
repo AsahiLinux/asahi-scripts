@@ -1,6 +1,6 @@
 PREFIX=/usr/local
 
-SCRIPTS=update-vendor-firmware update-grub first-boot
+SCRIPTS=update-vendor-firmware update-grub first-boot update-m1n1
 UNITS=first-boot.service update-vendor-firmware.service systemd-udev-trigger-early.service
 MULTI_USER_WANTS=first-boot.service
 SYSINIT_WANTS=update-vendor-firmware.service systemd-udev-trigger-early.service
