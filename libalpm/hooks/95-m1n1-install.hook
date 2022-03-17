@@ -1,0 +1,12 @@
+[Trigger]
+Type = Path
+Operation = Install
+Operation = Upgrade
+Target = usr/lib/modules/*/dtbs/*
+Target = usr/lib/asahi-boot/*
+
+[Action]
+Description = Updating m1n1 image...
+When = PostTransaction
+Exec = /usr/bin/update-m1n1
+NeedsTargets
