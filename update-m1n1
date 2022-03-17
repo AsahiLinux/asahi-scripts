@@ -14,7 +14,9 @@ if [ ! -e "$m1n1_dir" ]; then
 	exit 1
 fi
 
-cat "$src/m1n1.bin" "$src"/dtb/*.dtb \
+DTBS=/lib/modules/*-ARCH/dtbs/*
+
+cat "$src/m1n1.bin" $DTBS \
     <(gzip -c "$src/u-boot-nodtb.bin") \
     >"${target}.new"
 mv -f "${target}.new" "$target"
