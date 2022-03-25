@@ -12,3 +12,6 @@ ConditionDirectoryNotEmpty=/boot/efi/vendorfw
 Type=oneshot
 RemainAfterExit=yes
 ExecStart=update-vendor-firmware
+
+[Install]
+WantedBy=sysinit.target

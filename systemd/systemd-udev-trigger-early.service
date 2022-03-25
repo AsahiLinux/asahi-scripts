@@ -12,3 +12,6 @@ ConditionPathIsReadWrite=/sys
 Type=oneshot
 RemainAfterExit=yes
 ExecStart=-udevadm trigger --type=devices --action=add --subsystem-match=block
+
+[Install]
+WantedBy=sysinit.target
