@@ -28,6 +28,10 @@ search.fs_uuid $uuid root $part
 set prefix=(\$root)'/boot/grub'
 EOF
 
+# This script is broken. It's fixed in GRUB git, but until they release it,
+# let's just nuke it every time. We don't want it anyway.
+rm -f /etc/grub.d/30_uefi-firmware
+
 echo "Generating GRUB image..."
 grub-mkimage \
     --directory '/usr/lib/grub/arm64-efi' \
