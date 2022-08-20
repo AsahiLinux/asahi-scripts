@@ -1,17 +1,44 @@
 #!/bin/sh
 set -e
 
-m1n1_dir="/boot/efi/m1n1"
-src=/usr/lib/asahi-boot/
+src="/usr/lib/asahi-boot/"
+umount=false
 
-target="$m1n1_dir/boot.bin"
 if [ ! -z "$1" ]; then
-	target="$1"
-fi
+        target="$1"
+else
+	if [ -e "/boot/efi/m1n1" ]; then
+		mountpoint="/boot/efi"
+	elif [ -e "/boot/m1n1" ]; then
+		mountpoint="/boot"
+	else
+		mountpoint="/run/.efi"
+		esp_uuid="$(cat /proc/device-tree/chosen/asahi,efi-system-partition | tr -d '\0')"
 
-if [ ! -e "$m1n1_dir" ]; then
-	echo "$m1n1_dir does not exist, is /boot/efi mounted?" 1>&2
-	exit 1
+		if [ -z "$esp_uuid" ]; then
+			echo "ESP not found and cannot determine ESP PARTUUID."
+			echo "Make sure your ESP is mounted at /boot/efi or /boot,"
+			echo "or that your m1n1 has the right asahi,efi-system-partition configuration."
+			exit 1
+		fi
+
+		mkdir -p "$mountpoint"
+
+		while grep -q "$mountpoint" /proc/mounts; do
+			umount "$mountpoint"
+		done
+
+		mount "PARTUUID=$esp_uuid" "$mountpoint"
+		umount=true
+	fi
+
+	m1n1_dir="$mountpoint/m1n1"
+	target="$m1n1_dir/boot.bin"
+
+	if [ ! -e "$m1n1_dir" ]; then
+		echo "$m1n1_dir does not exist, is your EFI partition mounted properly?" 1>&2
+		exit 1
+	fi
 fi
 
 DTBS=/lib/modules/*-ARCH/dtbs/*
@@ -22,3 +49,6 @@ cat "$src/m1n1.bin" $DTBS \
 mv -f "${target}.new" "$target"
 
 echo "m1n1 updated at ${target}"
+$umount && umount "$mountpoint"
+
+true
