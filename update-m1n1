@@ -1,7 +1,18 @@
 #!/bin/sh
 set -e
 
-src="/usr/lib/asahi-boot/"
+ID=
+[ -e /etc/os-release ] && . /etc/os-release
+
+if [ "$ID" = fedora ]; then
+	m1n1_src="/usr/lib64/m1n1/"
+	uboot_src="/usr/share/uboot/apple_m1/"
+	DTBS=/boot/dtb-*/apple/*
+else
+	m1n1_src="/usr/lib/asahi-boot/"
+	uboot_src="/usr/lib/asahi-boot/"
+	DTBS=/lib/modules/*-ARCH/dtbs/*
+fi
 umount=false
 
 if [ ! -z "$1" ]; then
@@ -41,10 +52,8 @@ else
 	fi
 fi
 
-DTBS=/lib/modules/*-ARCH/dtbs/*
-
-cat "$src/m1n1.bin" $DTBS \
-    <(gzip -c "$src/u-boot-nodtb.bin") \
+cat "$m1n1_src/m1n1.bin" $DTBS \
+    <(gzip -c "$uboot_src/u-boot-nodtb.bin") \
     >"${target}.new"
 mv -f "${target}.new" "$target"
 
