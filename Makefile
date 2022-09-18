@@ -1,12 +1,14 @@
 PREFIX=/usr/local
 CONFIG_DIR=/etc/default
-SCRIPTS=update-vendor-firmware update-grub first-boot update-m1n1
+SCRIPTS=update-vendor-firmware update-m1n1
+ARCH_SCRIPTS=update-grub first-boot
 UNITS=first-boot.service
 MULTI_USER_WANTS=first-boot.service
 DRACUT_CONF_DIR=$(PREFIX)/lib/dracut/dracut.conf.d
 BUILD_SCRIPTS=$(addprefix build/,$(SCRIPTS))
+BUILD_ARCH_SCRIPTS=$(addprefix build/,$(ARCH_SCRIPTS))
 
-all: $(BUILD_SCRIPTS)
+all: $(BUILD_SCRIPTS) $(BUILD_ARCH_SCRIPTS)
 
 build/%: %
 	@[ ! -e build ] && mkdir -p build || true
@@ -16,17 +18,18 @@ build/%: %
 install: all
 	install -d $(DESTDIR)$(PREFIX)/bin/
 	install -m0755 -t $(DESTDIR)$(PREFIX)/bin/ $(BUILD_SCRIPTS)
-	install -dD $(DESTDIR)$(PREFIX)/lib/systemd/system
-	install -dD $(DESTDIR)$(PREFIX)/lib/systemd/system/{multi-user,sysinit}.target.wants
-	install -m0644 -t $(DESTDIR)$(PREFIX)/lib/systemd/system $(addprefix systemd/,$(UNITS))
-	ln -sf $(addprefix $(PREFIX)/lib/systemd/system/,$(MULTI_USER_WANTS)) \
-		$(DESTDIR)$(PREFIX)/lib/systemd/system/multi-user.target.wants/
 	install -dD $(DESTDIR)/etc
 	install -m0644 -t $(DESTDIR)/etc etc/m1n1.conf
 	install -dD $(DESTDIR)$(PREFIX)/share/asahi-scripts
 	install -m0644 -t $(DESTDIR)$(PREFIX)/share/asahi-scripts functions.sh
 
 install-arch: install
+	install -m0755 -t $(DESTDIR)$(PREFIX)/bin/ $(BUILD_ARCH_SCRIPTS)
+	install -dD $(DESTDIR)$(PREFIX)/lib/systemd/system
+	install -dD $(DESTDIR)$(PREFIX)/lib/systemd/system/{multi-user,sysinit}.target.wants
+	install -m0644 -t $(DESTDIR)$(PREFIX)/lib/systemd/system $(addprefix systemd/,$(UNITS))
+	ln -sf $(addprefix $(PREFIX)/lib/systemd/system/,$(MULTI_USER_WANTS)) \
+		$(DESTDIR)$(PREFIX)/lib/systemd/system/multi-user.target.wants/
 	install -dD $(DESTDIR)$(PREFIX)/lib/initcpio/install
 	install -m0644 -t $(DESTDIR)$(PREFIX)/lib/initcpio/install initcpio/install/asahi
 	install -dD $(DESTDIR)$(PREFIX)/lib/initcpio/hooks
