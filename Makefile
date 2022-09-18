@@ -16,6 +16,9 @@ build/%: %
 	sed -e s,/etc/default,$(CONFIG_DIR),g "$<" > "$@"
 	chmod +x "$@"
 
+clean:
+	rm -rf build
+
 install: all
 	install -d $(DESTDIR)$(BIN_DIR)/
 	install -m0755 -t $(DESTDIR)$(BIN_DIR)/ $(BUILD_SCRIPTS)
@@ -57,4 +60,4 @@ uninstall-arch:
 uninstall-fedora:
 	rm -f $(DESTDIR)$(DRACUT_CONF_DIR)/10-asahi.conf
 
-.PHONY: install install-arch install-fedora uninstall uninstall-arch uninstall-fedora
+.PHONY: clean install install-arch install-fedora uninstall uninstall-arch uninstall-fedora
