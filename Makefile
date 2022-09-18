@@ -19,6 +19,10 @@ install:
 	install -m0644 -t $(DESTDIR)$(PREFIX)/lib/initcpio/install initcpio/install/asahi
 	install -dD $(DESTDIR)$(PREFIX)/share/libalpm/hooks
 	install -m0644 -t $(DESTDIR)$(PREFIX)/share/libalpm/hooks libalpm/hooks/95-m1n1-install.hook
+	install -dD $(DESTDIR)/etc
+	install -m0644 -t $(DESTDIR)/etc etc/m1n1.conf
+	install -dD $(DESTDIR)$(PREFIX)/share/asahi-scripts
+	install -m0644 -t $(DESTDIR)$(PREFIX)/share/asahi-scripts functions.sh
 
 uninstall:
 	rm -f $(addprefix $(DESTDIR)$(PREFIX)/bin/,$(SCRIPTS))
@@ -27,5 +31,6 @@ uninstall:
 	rm -f $(addprefix $(DESTDIR)$(PREFIX)/lib/systemd/system/sysinit.target.wants/,$(SYSINIT_WANTS))
 	rm -f $(DESTDIR)$(PREFIX)/lib/initcpio/install/asahi
 	rm -f $(DESTDIR)$(PREFIX)/share/libalpm/hooks/95-m1n1-install.hook
+	rm -rf $(DESTDIR)$(PREFIX)/share/asahi-scripts
 
 .PHONY: install uninstall

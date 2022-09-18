@@ -1,36 +1,68 @@
-#!/bin/sh
+#!/bin/bash
 # SPDX-License-Identifier: MIT
 
 set -e
 
-BOOT_PART="/boot"
-EFI_PART="/boot/efi"
-GRUB_DIR="$BOOT_PART/grub"
-CONFIG="/boot/grub/grub.cfg"
-TARGET="$EFI_PART/EFI/BOOT/BOOTAA64.EFI"
-MODULES="ext2 part_gpt search"
-
 [ -e /etc/default/update-grub ] && source /etc/default/update-grub
 
+if [ -e "$(dirname "$0")"/functions.sh ]; then
+    . "$(dirname "$0")"/functions.sh
+else
+    . /usr/share/asahi-scripts/functions.sh
+fi
+
+: ${BOOT_PART:="/boot"}
+: ${EFI_PART:=}
+: ${GRUB_DIR:="$BOOT_PART/grub"}
+: ${CONFIG:="$GRUB_DIR/grub.cfg"}
+: ${MODULES:="ext2 fat part_gpt search"}
+
+umount=false
+
+if [ -z "$EFI_PART" ] && [ -z "$TARGET" ]; then
+    EFI_PART=/run/.boot-efi
+    mount_boot_esp "$EFI_PART"
+    umount=true
+fi
+
+: ${TARGET:="$EFI_PART/EFI/BOOT/BOOTAA64.EFI"}
+
+fs="$(grub-probe "$BOOT_PART" -t fs)"
 uuid="$(grub-probe "$BOOT_PART" -t fs_uuid)"
 part="$(grub-probe "$BOOT_PART" -t drive | sed -e 's/(.*,/hd0,/' | tr -d ')')"
+grub_path="$(grub-mkrelpath "$GRUB_DIR")"
 
 if [ -z "$uuid" ]; then
     echo "Error: Unable to determine root filesystem UUID"
     exit 1
 fi
 
+echo "Filesystem: $fs"
 echo "UUID: $uuid"
 echo "Partition: $part"
+echo "Relative path: $grub_path"
 
 cat > /tmp/grub-core.cfg <<EOF
 search.fs_uuid $uuid root $part
-set prefix=(\$root)'/boot/grub'
+set prefix=(\$root)'$grub_path'
 EOF
 
-# This script is broken. It's fixed in GRUB git, but until they release it,
-# let's just nuke it every time. We don't want it anyway.
-rm -f /etc/grub.d/30_uefi-firmware
+echo "Installing GRUB files..."
+mkdir -p "$GRUB_DIR"
+touch "$GRUB_DIR"/device.map
+dd if=/dev/zero of="$GRUB_DIR"/grubenv bs=1024 count=1 2>/dev/null
+cp -r /usr/share/grub/themes "$GRUB_DIR"
+cp -r /usr/lib/grub/arm64-efi "$GRUB_DIR"
+rm -f "$GRUB_DIR"/arm64-efi/*.module
+mkdir -p "$GRUB_DIR"/{fonts,locale}
+cp /usr/share/grub/unicode.pf2 "$GRUB_DIR"/fonts
+for i in /usr/share/locale/*/LC_MESSAGES/grub.mo; do
+    lc="$(echo "$i" | cut -d/ -f5)"
+    cp "$i" "$GRUB_DIR"/locale/"$lc".mo
+done
+
+[[ $MODULES != *$fs* ]] && MODULES="$MODULES $fs"
+echo "Core image modules: $MODULES"
 
 echo "Generating GRUB image..."
 grub-mkimage \
@@ -45,3 +77,6 @@ grub-mkimage \
 cp "$GRUB_DIR"/arm64-efi/core.efi "$TARGET"
 
 grub-mkconfig -o "$CONFIG"
+
+$umount && umount "$EFI_PART"
+true

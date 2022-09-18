@@ -1,54 +1,57 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
-src="/usr/lib/asahi-boot/"
-umount=false
+[ -e /etc/default/update-m1n1 ] && source /etc/default/update-m1n1
 
-if [ ! -z "$1" ]; then
-        target="$1"
+if [ -e "$(dirname "$0")"/functions.sh ]; then
+    . "$(dirname "$0")"/functions.sh
 else
-	if [ -e "/boot/efi/m1n1" ]; then
-		mountpoint="/boot/efi"
-	elif [ -e "/boot/m1n1" ]; then
-		mountpoint="/boot"
-	else
-		mountpoint="/run/.efi"
-		esp_uuid="$(cat /proc/device-tree/chosen/asahi,efi-system-partition | tr -d '\0')"
-
-		if [ -z "$esp_uuid" ]; then
-			echo "ESP not found and cannot determine ESP PARTUUID."
-			echo "Make sure your ESP is mounted at /boot/efi or /boot,"
-			echo "or that your m1n1 has the right asahi,efi-system-partition configuration."
-			exit 1
-		fi
-
-		mkdir -p "$mountpoint"
-
-		while grep -q "$mountpoint" /proc/mounts; do
-			umount "$mountpoint"
-		done
-
-		mount "PARTUUID=$esp_uuid" "$mountpoint"
-		umount=true
-	fi
-
-	m1n1_dir="$mountpoint/m1n1"
-	target="$m1n1_dir/boot.bin"
-
-	if [ ! -e "$m1n1_dir" ]; then
-		echo "$m1n1_dir does not exist, is your EFI partition mounted properly?" 1>&2
-		exit 1
-	fi
+    . /usr/share/asahi-scripts/functions.sh
 fi
 
-DTBS=/lib/modules/*-ARCH/dtbs/*
+: ${SOURCE:="/usr/lib/asahi-boot/"}
+: ${M1N1:="$SOURCE/m1n1.bin"}
+: ${U_BOOT:="$SOURCE/u-boot-nodtb.bin"}
+: ${TARGET:="$1"}
+: ${DTBS:=/lib/modules/*-ARCH/dtbs/*.dtb}
+: ${CONFIG:=/etc/m1n1.conf}
 
-cat "$src/m1n1.bin" $DTBS \
-    <(gzip -c "$src/u-boot-nodtb.bin") \
-    >"${target}.new"
-mv -f "${target}.new" "$target"
+umount=false
 
-echo "m1n1 updated at ${target}"
-$umount && umount "$mountpoint"
+m1n1config=/run/m1n1.conf
+>"$m1n1config"
 
+if [ -e "$CONFIG" ]; then
+    info "Reading m1n1 config from $CONFIG:"
+    while read line; do
+        case "$line" in
+            "") ;;
+            \#*) ;;
+            chosen.*=*|display=*)
+                echo "$line" >> "$m1n1config"
+                info "  Option: $line"
+                ;;
+            *)
+                warn "  Ignoring unknown option: $line"
+                ;;
+        esac
+    done <$CONFIG
+fi
+
+if [ -z "$TARGET" ]; then
+    mount_sys_esp /run/.system-efi
+    TARGET="/run/.system-efi/m1n1/boot.bin"
+    umount=true
+fi
+
+cat "$M1N1" $DTBS \
+    <(gzip -c "$U_BOOT") \
+    "$m1n1config" \
+   >"${TARGET}.new"
+
+[ -e "$TARGET" ] && mv -f "$TARGET" "${TARGET}.old"
+mv -f "${TARGET}.new" "$TARGET"
+
+echo "m1n1 updated at ${TARGET}"
+$umount && umount /run/.system-efi
 true

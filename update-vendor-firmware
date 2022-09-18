@@ -1,33 +1,55 @@
-#!/bin/sh
+#!/bin/bash
 # SPDX-License-Identifier: MIT
 
 set -e
 
-VENDORFW=/boot/efi/vendorfw/
-TARGET=/lib/firmware/
-TARGET_MANIFEST=".vendorfw.manifest"
-
 [ -e /etc/default/update-vendor-firmware ] && source /etc/default/update-vendor-firmware
+
+if [ -e "$(dirname "$0")"/functions.sh ]; then
+    . "$(dirname "$0")"/functions.sh
+else
+    . /usr/share/asahi-scripts/functions.sh
+fi
+
+: ${VENDORFW:=}
+: ${TARGET_ROOT:=/}
+: ${TARGET:=/lib/firmware/}
+: ${TARGET_MANIFEST:=".vendorfw.manifest"}
+
+umount=false
+
+if [ -z "$VENDORFW" ]; then
+    mount_sys_esp /run/.system-efi
+    VENDORFW="/run/.system-efi/vendorfw/"
+    umount=true
+fi
 
 if [ ! -e "$VENDORFW" ]; then
     echo "No vendor firmware available"
+    $umount && umount /run/.system-efi
     exit 0
 fi
 
 if [ ! -e "$VENDORFW/manifest.txt" ]; then
     echo "$VENDORFW/manifest.txt not found"
+    $umount && umount /run/.system-efi
     exit 1
 fi
 
 if [ ! -e "$VENDORFW/firmware.tar" ]; then
     echo "$VENDORFW/firmware.tar not found"
+    $umount && umount /run/.system-efi
     exit 1
 fi
 
-cd "$TARGET"
+cd "$TARGET_ROOT/$TARGET"
 
-[ -e "$TARGET_MANIFEST" ] && \
-    cmp -s "$TARGET_MANIFEST" "$VENDORFW/manifest.txt" && exit 0
+if [ -e "$TARGET_MANIFEST" ] && \
+    cmp -s "$TARGET_MANIFEST" "$VENDORFW/manifest.txt"; then
+    echo "Vendor firmware is up to date, nothing to do."
+    $umount && umount /run/.system-efi
+    exit 0
+fi
 
 echo "Extracting updated vendor firmware..."
 tar xf "$VENDORFW/firmware.tar"
@@ -45,5 +67,7 @@ if [ -e "$TARGET_MANIFEST" ]; then
 fi
 
 cp "$VENDORFW/manifest.txt" "$TARGET_MANIFEST"
-    
+
 echo "Done"
+$umount && umount /run/.system-efi
+true
