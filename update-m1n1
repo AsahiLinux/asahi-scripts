@@ -1,4 +1,6 @@
 #!/bin/sh
+# SPDX-License-Identifier: MIT
+
 set -e
 
 [ -e /etc/default/update-m1n1 ] && . /etc/default/update-m1n1
