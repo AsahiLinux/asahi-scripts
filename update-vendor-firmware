@@ -1,6 +1,8 @@
 #!/bin/bash
 # SPDX-License-Identifier: MIT
 
+# NOTE: This script runs in the initramfs, so it must be ash/busybox compatible!
+
 set -e
 
 [ -e /etc/default/update-vendor-firmware ] && source /etc/default/update-vendor-firmware
