@@ -1,0 +1,33 @@
+#!/usr/bin/ash
+
+run_earlyhook() {
+    if [ ! -e /proc/device-tree/chosen/asahi,efi-system-partition ]; then
+        msg ":: Asahi: Missing asahi,efi-system-partition variable, firmware will not be loaded!"
+        return 1
+    fi
+
+    msg ":: Asahi: Triggering early load of NVMe modules..."
+    modprobe apple-mailbox
+    modprobe nvme-apple
+
+    for i in $(seq 0 50); do
+        [ -e /sys/bus/platform/drivers/nvme-apple/*.nvme/nvme/nvme*/nvme*n1/ ] && break
+        sleep 0.1
+    done
+
+    if [ ! -e /sys/bus/platform/drivers/nvme-apple/*.nvme/nvme/nvme*/nvme*n1/ ]; then
+        err "Timed out waiting for NVMe device"
+        return 1
+    fi
+
+    # If the above exists, hopefully the /dev device exists and this will work
+    msg ":: Asahi: Unpacking vendor firmware into initramfs..."
+    mkdir -p /lib/firmware
+    ash /usr/bin/update-vendor-firmware
+}
+
+run_latehook() {
+    msg ":: Asahi: Updating vendor firmware in root filesystem..."
+    mkdir -p /new_root/lib/firmware
+    TARGET_ROOT=/new_root ash /usr/bin/update-vendor-firmware
+}

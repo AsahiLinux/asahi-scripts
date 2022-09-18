@@ -7,7 +7,7 @@ build() {
     add_module apple-mailbox?
 
     # For NVMe
-    add_module nvme_apple?
+    add_module nvme-apple?
 
     # For USB and HID
     add_module pinctrl-apple-gpio?
@@ -28,6 +28,13 @@ build() {
 
     # For MTP HID
     map add_module apple-dockchannel? dockchannel-hid? apple-rtkit-helper?
+
+    # asahi-scripts dependencies
+    add_full_dir /usr/share/asahi-scripts
+    add_binary /usr/bin/update-vendor-firmware
+
+    # Firmware update script
+    add_runscript
 }
 
 help() {

@@ -1,5 +1,7 @@
 # SPDX-License-Identifier: MIT
 
+# NOTE: These functions are used in the initramfs, so they must be ash/busybox compatible!
+
 info() {
     echo "$@" 1>&2
 }
@@ -17,7 +19,7 @@ mount_sys_esp() {
         umount "$mountpoint"
     done
 
-    esp_uuid="$(cat /proc/device-tree/chosen/asahi,efi-system-partition 2>/dev/null | tr -d '\0')"
+    esp_uuid="$(cat /proc/device-tree/chosen/asahi,efi-system-partition 2>/dev/null | sed 's/\x00//')"
     if [ -z "$esp_uuid" ]; then
         if [ -e "/boot/efi/m1n1" ]; then
             bootmnt="/boot/efi"
@@ -52,7 +54,7 @@ mount_boot_esp() {
     elif [ -e "/boot/efi/boot" ]; then
         mount --bind "/boot" "$mountpoint"
     else
-        esp_uuid="$(cat /proc/device-tree/chosen/asahi,efi-system-partition | tr -d '\0')"
+        esp_uuid="$(cat /proc/device-tree/chosen/asahi,efi-system-partition | sed 's/\x00//')"
 
         if [ -z "$esp_uuid" ]; then
             echo "Boot ESP not found and cannot determine ESP PARTUUID."
