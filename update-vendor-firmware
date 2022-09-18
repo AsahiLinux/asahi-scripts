@@ -46,11 +46,14 @@ fi
 
 cd "$TARGET_ROOT/$TARGET"
 
-if [ -e "$TARGET_MANIFEST" ] && \
-    cmp -s "$TARGET_MANIFEST" "$VENDORFW/manifest.txt"; then
-    echo "Vendor firmware is up to date, nothing to do."
-    $umount && umount /run/.system-efi
-    exit 0
+if [ -e "$TARGET_MANIFEST" ]; then
+    h_cur=$(sha1sum "$TARGET_MANIFEST" | cut -d" " -f1)
+    h_new=$(sha1sum "$VENDORFW/manifest.txt" | cut -d" " -f1)
+    if [ "$h_cur" == "$h_new" ]; then
+        echo "Vendor firmware is up to date, nothing to do."
+        $umount && umount /run/.system-efi
+        exit 0
+    fi
 fi
 
 echo "Extracting updated vendor firmware..."

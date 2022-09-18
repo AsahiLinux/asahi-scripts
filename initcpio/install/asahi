@@ -33,6 +33,7 @@ build() {
     # asahi-scripts dependencies
     add_full_dir /usr/share/asahi-scripts
     add_binary /usr/bin/update-vendor-firmware
+    add_binary /usr/bin/comm
 
     # Firmware update script
     add_runscript
