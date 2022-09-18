@@ -61,7 +61,7 @@ if [ -e "$TARGET_MANIFEST" ]; then
     sort "$TARGET_MANIFEST" > /run/vendorfw.manifest.tmp
     sort "$VENDORFW/manifest.txt" | comm - \
         /run/vendorfw.manifest.tmp -13 | \
-        while read type name rest; do
+        while read -r type name rest; do
             rm -v "$name" || true
             dir="$(dirname "$name")"
             rmdir "$dir" 2>/dev/null || true
