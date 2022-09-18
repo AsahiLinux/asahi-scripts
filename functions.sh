@@ -36,7 +36,7 @@ mount_sys_esp() {
     else
         mount "PARTUUID=$esp_uuid" "$mountpoint"
     fi
-    dev="$(grep /run/.system-efi /proc/mounts | cut -d" " -f1)"
+    dev="$(grep "$mountpoint" /proc/mounts | cut -d" " -f1)"
     info "Mounted System ESP $dev at $mountpoint"
 }
 
