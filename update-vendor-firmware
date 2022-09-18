@@ -1,11 +1,11 @@
-#!/bin/bash
+#!/bin/sh
 # SPDX-License-Identifier: MIT
 
 # NOTE: This script runs in the initramfs, so it must be ash/busybox compatible!
 
 set -e
 
-[ -e /etc/default/update-vendor-firmware ] && source /etc/default/update-vendor-firmware
+[ -e /etc/default/update-vendor-firmware ] && . /etc/default/update-vendor-firmware
 
 if [ -e "$(dirname "$0")"/functions.sh ]; then
     . "$(dirname "$0")"/functions.sh
@@ -58,14 +58,15 @@ tar xf "$VENDORFW/firmware.tar"
 
 if [ -e "$TARGET_MANIFEST" ]; then
     echo "Cleaning up obsolete firmware..."
-    comm \
-        <(sort "$VENDORFW/manifest.txt") \
-        <(sort "$TARGET_MANIFEST") -13 | \
+    sort "$TARGET_MANIFEST" > /run/vendorfw.manifest.tmp
+    sort "$VENDORFW/manifest.txt" | comm - \
+        /run/vendorfw.manifest.tmp -13 | \
         while read type name rest; do
             rm -v "$name" || true
             dir="$(dirname "$name")"
             rmdir "$dir" 2>/dev/null || true
         done
+    rm /run/vendorfw.manifest.tmp
 fi
 
 cp "$VENDORFW/manifest.txt" "$TARGET_MANIFEST"

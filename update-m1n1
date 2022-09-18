@@ -1,7 +1,7 @@
-#!/bin/bash
+#!/bin/sh
 set -e
 
-[ -e /etc/default/update-m1n1 ] && source /etc/default/update-m1n1
+[ -e /etc/default/update-m1n1 ] && . /etc/default/update-m1n1
 
 if [ -e "$(dirname "$0")"/functions.sh ]; then
     . "$(dirname "$0")"/functions.sh
@@ -44,10 +44,9 @@ if [ -z "$TARGET" ]; then
     umount=true
 fi
 
-cat "$M1N1" $DTBS \
-    <(gzip -c "$U_BOOT") \
-    "$m1n1config" \
-   >"${TARGET}.new"
+cat "$M1N1" $DTBS >"${TARGET}.new"
+gzip -c "$U_BOOT" >>"${TARGET}.new"
+cat "$m1n1config" >>"${TARGET}.new"
 
 [ -e "$TARGET" ] && mv -f "$TARGET" "${TARGET}.old"
 mv -f "${TARGET}.new" "$TARGET"
