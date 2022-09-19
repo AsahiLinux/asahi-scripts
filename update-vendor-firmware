@@ -57,7 +57,7 @@ if [ -e "$TARGET_MANIFEST" ]; then
 fi
 
 echo "Extracting updated vendor firmware..."
-tar xf "$VENDORFW/firmware.tar"
+tar -x --overwrite -f "$VENDORFW/firmware.tar"
 
 if [ -e "$TARGET_MANIFEST" ]; then
     echo "Cleaning up obsolete firmware..."
