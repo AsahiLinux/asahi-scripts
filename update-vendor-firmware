@@ -17,6 +17,7 @@ fi
 : ${TARGET_ROOT:=/}
 : ${TARGET:=/lib/firmware/}
 : ${TARGET_MANIFEST:=".vendorfw.manifest"}
+: ${CACHE:=}
 
 umount=false
 
@@ -54,6 +55,12 @@ if [ -e "$TARGET_MANIFEST" ]; then
         $umount && umount /run/.system-efi
         exit 0
     fi
+fi
+
+if [ -n "$CACHE" ]; then
+  echo "Caching vendor firmware..."
+  cp -pr "$VENDORFW" /run
+  VENDORFW=/run/vendorfw
 fi
 
 echo "Extracting updated vendor firmware..."
