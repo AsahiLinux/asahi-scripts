@@ -1,0 +1,19 @@
+# SPDX-License-Identifier: MIT
+
+[Unit]
+Description=Update vendor firmware
+DefaultDependencies=no
+Conflicts=shutdown.target
+After=systemd-remount-fs.target
+Before=systemd-udev-trigger.service sysinit.target shutdown.target
+ConditionDirectoryNotEmpty=/run/vendorfw
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+Environment=VENDORFW=/run/vendorfw
+ExecStart=update-vendor-firmware
+ExecStart=rm -r /run/vendorfw
+
+[Install]
+WantedBy=sysinit.target

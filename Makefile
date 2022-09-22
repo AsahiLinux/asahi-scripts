@@ -5,6 +5,7 @@ SCRIPTS=update-vendor-firmware update-m1n1
 ARCH_SCRIPTS=update-grub first-boot
 UNITS=first-boot.service
 MULTI_USER_WANTS=first-boot.service
+FEDORA_UNITS=update-vendor-firmware.service
 DRACUT_CONF_DIR=$(PREFIX)/lib/dracut/dracut.conf.d
 BUILD_SCRIPTS=$(addprefix build/,$(SCRIPTS))
 BUILD_ARCH_SCRIPTS=$(addprefix build/,$(ARCH_SCRIPTS))
@@ -42,6 +43,8 @@ install-arch: install
 	install -m0644 -t $(DESTDIR)$(PREFIX)/share/libalpm/hooks libalpm/hooks/95-m1n1-install.hook
 
 install-fedora: install
+	install -dD $(DESTDIR)$(PREFIX)/lib/systemd/system
+	install -m0644 -t $(DESTDIR)$(PREFIX)/lib/systemd/system $(addprefix systemd/,$(FEDORA_UNITS))
 	install -dD $(DESTDIR)$(DRACUT_CONF_DIR)
 	install -m0644 -t $(DESTDIR)$(DRACUT_CONF_DIR) dracut/10-asahi.conf
 
