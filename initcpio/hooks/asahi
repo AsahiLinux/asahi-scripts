@@ -2,6 +2,11 @@
 # SPDX-License-Identifier: MIT
 
 run_earlyhook() {
+    if [ -e /vendorfw ]; then
+        msg ":: Asahi: Vendor firmware was loaded by the bootloader"
+        return 0
+    fi
+
     if [ ! -e /proc/device-tree/chosen/asahi,efi-system-partition ]; then
         msg ":: Asahi: Missing asahi,efi-system-partition variable, firmware will not be loaded!"
         return 1
@@ -23,12 +28,13 @@ run_earlyhook() {
 
     # If the above exists, hopefully the /dev device exists and this will work
     msg ":: Asahi: Unpacking vendor firmware into initramfs..."
-    mkdir -p /lib/firmware
-    ash /usr/bin/update-vendor-firmware
+    mkdir -p /vendorfw
+    TARGET=/vendorfw ash /usr/bin/update-vendor-firmware
 }
 
 run_latehook() {
-    msg ":: Asahi: Updating vendor firmware in root filesystem..."
-    mkdir -p /new_root/lib/firmware
-    TARGET_ROOT=/new_root ash /usr/bin/update-vendor-firmware
+    msg ":: Asahi: Copying vendor firmware to tmpfs under root filesystem..."
+    mkdir -p /new_root/lib/firmware/vendor
+    mount -t tmpfs vendorfw /new_root/lib/firmware/vendor
+    cp -r /vendorfw/* /vendorfw/.vendorfw.manifest /new_root/lib/firmware/vendor
 }

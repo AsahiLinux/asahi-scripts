@@ -37,6 +37,8 @@ build() {
 
     # Firmware update script
     add_runscript
+    add_dir /lib/firmware
+    add_symlink /lib/firmware/vendor /vendorfw
 }
 
 help() {

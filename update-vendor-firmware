@@ -18,6 +18,11 @@ fi
 : ${TARGET:=/lib/firmware/}
 : ${TARGET_MANIFEST:=".vendorfw.manifest"}
 
+if [ -e "$TARGET/vendor/$TARGET_MANIFEST" ]; then
+    echo "New-style vendorfw detected, nothing to update"
+    exit 0
+fi
+
 umount=false
 
 if [ -z "$VENDORFW" ]; then
