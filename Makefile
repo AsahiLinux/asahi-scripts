@@ -1,7 +1,7 @@
 PREFIX=/usr/local
 CONFIG_DIR=/etc/default
 BIN_DIR=$(PREFIX)/bin
-SCRIPTS=update-vendor-firmware update-m1n1
+SCRIPTS=update-m1n1
 ARCH_SCRIPTS=update-grub first-boot
 UNITS=first-boot.service
 MULTI_USER_WANTS=first-boot.service

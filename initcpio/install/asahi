@@ -30,10 +30,8 @@ build() {
     # For MTP HID
     map add_module apple-dockchannel? dockchannel-hid? apple-rtkit-helper?
 
-    # asahi-scripts dependencies
+    # Hook dependencies
     add_full_dir /usr/share/asahi-scripts
-    add_binary /usr/bin/update-vendor-firmware
-    add_binary /usr/bin/comm
 
     # Firmware update script
     add_runscript

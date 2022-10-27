@@ -27,9 +27,26 @@ run_earlyhook() {
     fi
 
     # If the above exists, hopefully the /dev device exists and this will work
+
     msg ":: Asahi: Unpacking vendor firmware into initramfs..."
-    mkdir -p /vendorfw
-    TARGET=/vendorfw ash /usr/bin/update-vendor-firmware
+
+    VENDORFW="/run/.system-efi/vendorfw/"
+
+    (
+        . /usr/share/asahi-scripts/functions.sh
+        mount_sys_esp /run/.system-efi
+    )
+
+    if [ ! -e "$VENDORFW/firmware.cpio" ]; then
+        msg ":: Asahi: Vendor firmware not available in ESP!"
+        umount /run/.system-efi
+        return 1
+    fi
+
+    ( cd /; cpio -i < "$VENDORFW/firmware.cpio" )
+    umount /run/.system-efi
+
+    msg ":: Asahi: Vendor firmware unpacked successfully"
 }
 
 run_latehook() {
