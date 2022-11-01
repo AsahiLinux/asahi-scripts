@@ -40,7 +40,7 @@ fi
 
 echo "Upgrading vendor firmware package"
 "$PYTHON" -m asahi_firmware.update "$ASAHIFW" "$VENDORFWTMP"
-mv -f "${VENDORFWTMP}/*" "$VENDORFW"
+mv -f ${VENDORFWTMP}/* "$VENDORFW"
 rmdir "$VENDORFWTMP"
 echo "Firmware upgraded"
 
