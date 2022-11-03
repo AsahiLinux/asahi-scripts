@@ -3,11 +3,6 @@
 
 type getarg > /dev/null 2>&1 || . /lib/dracut-lib.sh
 
-if [ -e /vendorfw ]; then
-    info ":: Asahi: Vendor firmware was loaded by the bootloader"
-    return 0
-fi
-
 if [ ! -e /proc/device-tree/chosen/asahi,efi-system-partition ]; then
     info ":: Asahi: Missing asahi,efi-system-partition variable, firmware will not be loaded!"
     return 0
