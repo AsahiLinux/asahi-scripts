@@ -6,6 +6,7 @@ ARCH_SCRIPTS=update-grub first-boot
 UNITS=first-boot.service
 MULTI_USER_WANTS=first-boot.service
 DRACUT_CONF_DIR=$(PREFIX)/lib/dracut/dracut.conf.d
+DRACUT_MODULES_DIR=$(PREFIX)/lib/dracut/modules.d
 BUILD_SCRIPTS=$(addprefix build/,$(SCRIPTS))
 BUILD_ARCH_SCRIPTS=$(addprefix build/,$(ARCH_SCRIPTS))
 
@@ -26,6 +27,7 @@ install: all
 	install -m0644 -t $(DESTDIR)/etc etc/m1n1.conf
 	install -dD $(DESTDIR)$(PREFIX)/share/asahi-scripts
 	install -m0644 -t $(DESTDIR)$(PREFIX)/share/asahi-scripts functions.sh
+	install -dD $(DESTDIR)/lib/firmware/vendor
 
 install-mkinitcpio: install
 	install -dD $(DESTDIR)$(PREFIX)/lib/initcpio/install
@@ -35,7 +37,11 @@ install-mkinitcpio: install
 
 install-dracut: install
 	install -dD $(DESTDIR)$(DRACUT_CONF_DIR)
-	install -m0644 -t $(DESTDIR)$(DRACUT_CONF_DIR) dracut/10-asahi.conf
+	install -m0644 -t $(DESTDIR)$(DRACUT_CONF_DIR) dracut/dracut.conf.d/10-asahi.conf
+	install -dD $(DESTDIR)$(DRACUT_MODULES_DIR)/99asahi-firmware
+	install -m0755 -t $(DESTDIR)$(DRACUT_MODULES_DIR)/99asahi-firmware dracut/modules.d/99asahi-firmware/install-asahi-firmware.sh
+	install -m0755 -t $(DESTDIR)$(DRACUT_MODULES_DIR)/99asahi-firmware dracut/modules.d/99asahi-firmware/load-asahi-firmware.sh
+	install -m0755 -t $(DESTDIR)$(DRACUT_MODULES_DIR)/99asahi-firmware dracut/modules.d/99asahi-firmware/module-setup.sh
 
 install-arch: install install-mkinitcpio
 	install -m0755 -t $(DESTDIR)$(BIN_DIR)/ $(BUILD_ARCH_SCRIPTS)
