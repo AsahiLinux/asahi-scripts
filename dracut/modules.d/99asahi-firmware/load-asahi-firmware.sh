@@ -43,5 +43,5 @@ if [ ! -e "$VENDORFW/firmware.cpio" ]; then
     return 1
 fi
 
-( cd /; cpio -i < "$VENDORFW/firmware.cpio" )
+( cd /; cpio --quiet -i < "$VENDORFW/firmware.cpio" )
 info ":: Asahi firmware unpacked successfully"
