@@ -3,7 +3,16 @@
 # NOTE: These functions are used in the initramfs, so they must be ash/busybox compatible!
 
 info() {
-    echo "$@" 1>&2
+    quiet=0
+    if [ -e /lib/dracut-lib.sh ]; then
+        if grep -q "rd.debug" /proc/cmdline; then
+            quiet=0
+        elif grep -q "quiet" /proc/cmdline; then
+            quiet=1
+        fi
+    fi
+
+    [ "$quiet" -eq 0 ] && echo "$@" 1>&2
 }
 
 warn() {
