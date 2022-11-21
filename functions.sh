@@ -29,7 +29,7 @@ mount_sys_esp() {
     done
 
     esp_uuid="$(cat /proc/device-tree/chosen/asahi,efi-system-partition 2>/dev/null | sed 's/\x00//')"
-    if [ -z "$esp_uuid" ]; then
+    if [ -e /boot/efi/.builder ] || [ -e /boot/.builder ] || [ -z "$esp_uuid" ]; then
         if [ -e "/boot/efi/m1n1" ]; then
             bootmnt="/boot/efi"
         elif [ -e "/boot/m1n1" ]; then
