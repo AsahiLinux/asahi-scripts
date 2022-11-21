@@ -1,4 +1,5 @@
 PREFIX=/usr/local
+SYS_PREFIX=$(PREFIX)
 CONFIG_DIR=/etc/default
 BIN_DIR=$(PREFIX)/bin
 SCRIPTS=asahi-fwextract update-m1n1
@@ -27,7 +28,7 @@ install: all
 	install -m0644 -t $(DESTDIR)/etc etc/m1n1.conf
 	install -dD $(DESTDIR)$(PREFIX)/share/asahi-scripts
 	install -m0644 -t $(DESTDIR)$(PREFIX)/share/asahi-scripts functions.sh
-	install -dD $(DESTDIR)/lib/firmware/vendor
+	install -dD $(DESTDIR)/$(SYS_PREFIX)/lib/firmware/vendor
 
 install-mkinitcpio: install
 	install -dD $(DESTDIR)$(PREFIX)/lib/initcpio/install
