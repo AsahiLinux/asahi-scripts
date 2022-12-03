@@ -1,0 +1,7 @@
+[Unit]
+Description=Asahi Late Firmware
+After=initrd-fs.target cryptsetup.target
+Requires=asahi-late-firmware.service
+
+[Install]
+WantedBy=initrd.target

@@ -1,0 +1,8 @@
+[Unit]
+Description=Asahi Early Firmware Service
+DefaultDependencies=no
+Conflicts=shutdown.target
+Before=shutdown.target
+
+[Service]
+ExecStart=+/usr/share/asahi-scripts/fwhooks early_load

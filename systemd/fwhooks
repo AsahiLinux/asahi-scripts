@@ -1,0 +1,33 @@
+#!/usr/bin/sh
+# SPDX-License-Identifier: MIT
+
+# init functions are not available with systemd out of the box
+
+msg() {
+    local mesg=$1; shift
+    printf "$_color_green==>$_color_none $_color_bold$mesg$_color_none\n" "$@" >&1
+}
+
+early_load() {
+    msg ":: Asahi: Waiting until sysroot and vendorfw become available..."
+
+    # initrd-fs.target does not exactly mean that sysroot is fully mounted, we need to wait for both of these to appear.
+    # I've also tried `sleep 0.1` but systemd kills it way too fast, better this real infinite loop
+
+    while true; do
+	    [[ -d /sysroot/lib && -d /vendorfw ]] && break
+    done
+
+    run_earlyhook
+}
+
+late_mount() {
+    run_latehook
+}
+
+# what should be appended:
+# the functions (w body): `run_earlyhook`, `run_latehook`, with new_root replaced with sysroot
+# `\n$1`, since the function running needs to be selected during boot
+# all preferably indented for readability
+# in total:
+# 	sed '1,2d;s/new_root/sysroot/g;$s/$/\n\n$1/' initcpio/hooks/asahi >> systemd/fwhook.sh

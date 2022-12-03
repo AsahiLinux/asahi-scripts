@@ -36,6 +36,15 @@ install-mkinitcpio: install
 	install -dD $(DESTDIR)$(PREFIX)/lib/initcpio/hooks
 	install -m0644 -t $(DESTDIR)$(PREFIX)/lib/initcpio/hooks initcpio/hooks/asahi
 
+install-sd-asahi: install
+	chmod +x sd-asahi-build
+	./sd-asahi-build
+	install -dD $(DESTDIR)/etc/mkinitcpio.d
+	install -m0644 -t $(DESTDIR)/etc/mkinitcpio.d etc/mkinitcpio.d/*
+	install -m0644 -t $(DESTDIR)$(PREFIX)/lib/initcpio/install initcpio/install/sd-asahi
+	install -m0644 -t $(DESTDIR)$(PREFIX)/lib/systemd/system systemd/sd-asahi-*
+	install -m0755 -t $(DESTDIR)$(PREFIX)/share/asahi-scripts systemd/fwhooks
+
 install-dracut: install
 	install -dD $(DESTDIR)$(DRACUT_CONF_DIR)
 	install -m0644 -t $(DESTDIR)$(DRACUT_CONF_DIR) dracut/dracut.conf.d/10-asahi.conf
@@ -44,7 +53,7 @@ install-dracut: install
 	install -m0755 -t $(DESTDIR)$(DRACUT_MODULES_DIR)/99asahi-firmware dracut/modules.d/99asahi-firmware/load-asahi-firmware.sh
 	install -m0755 -t $(DESTDIR)$(DRACUT_MODULES_DIR)/99asahi-firmware dracut/modules.d/99asahi-firmware/module-setup.sh
 
-install-arch: install install-mkinitcpio
+install-arch: install install-mkinitcpio install-sd-asahi
 	install -m0755 -t $(DESTDIR)$(BIN_DIR)/ $(BUILD_ARCH_SCRIPTS)
 	install -dD $(DESTDIR)$(PREFIX)/lib/systemd/system
 	install -dD $(DESTDIR)$(PREFIX)/lib/systemd/system/{multi-user,sysinit}.target.wants
@@ -64,10 +73,15 @@ uninstall-mkinitcpio:
 	rm -f $(DESTDIR)$(PREFIX)/lib/initcpio/install/asahi
 	rm -f $(DESTDIR)$(PREFIX)/lib/initcpio/hooks/asahi
 
+uninstall-sd-asahi:
+	rm -f $(DESTDIR)$(PREFIX)/lib/initcpio/install/sd-asahi
+	rm -f $(DESTDIR)$(PREFIX)/lib/systemd/system/sd-asahi-*
+	rm -f $(DESTDIR)/etc/mkinitcpio.d/linux-sd-asahi.preset*
+
 uninstall-dracut:
 	rm -f $(DESTDIR)$(DRACUT_CONF_DIR)/10-asahi.conf
 
-uninstall-arch: uninstall-mkinitcpio
+uninstall-arch: uninstall-mkinitcpio uninstall-sd-asahi
 	rm -f $(addprefix $(DESTDIR)$(BIN_DIR)/,$(ARCH_SCRIPTS))
 	rm -f $(addprefix $(DESTDIR)$(PREFIX)/lib/systemd/system/,$(UNITS))
 	rm -f $(addprefix $(DESTDIR)$(PREFIX)/lib/systemd/system/multi-user.target.wants/,$(MULTI_USER_WANTS))
@@ -75,4 +89,4 @@ uninstall-arch: uninstall-mkinitcpio
 
 uninstall-fedora: uninstall-dracut
 
-.PHONY: clean install install-mkinitcpio install-dracut install-arch install-fedora uninstall uninstall-mkinitcpio uninstall-dracut uninstall-arch uninstall-fedora
+.PHONY: clean install install-mkinitcpio install-sd-asahi install-dracut install-arch install-fedora uninstall uninstall-mkinitcpio uninstall-sd-asahi uninstall-dracut uninstall-arch uninstall-fedora

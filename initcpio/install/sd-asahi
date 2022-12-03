@@ -1,0 +1,38 @@
+#!/bin/bash
+# SPDX-License-Identifier: MIT
+
+build() {
+
+    asahi_base_build
+
+    # ~~~~~~~~~~~~~~~~~~~ SYSTEMD ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    #
+    # Runhook is replaced by systemd units
+    # These need to be in /usr/lib/systemd/system
+
+    map add_systemd_unit 'sd-asahi-early-firmware.target' 'sd-asahi-late-firmware.target'
+
+    # We need to manually link the units because systemd doesn't have a way of enabling for initramfs (??) but this
+
+    add_symlink '/usr/lib/systemd/system/sysinit.target.wants/sd-asahi-early-firmware.target' '/usr/lib/systemd/system/sd-asahi-early-firmware.target'
+
+    add_dir '/usr/lib/systemd/system/initrd.target.wants'
+
+    add_symlink '/usr/lib/systemd/system/initrd.target.wants/sd-asahi-late-firmware.target' '/usr/lib/systemd/system/sd-asahi-late-firmware.target'
+
+    # The following are added automatically by add_systemd_unit because of Requires=
+    
+	# 'sd-asahi-early-firmware.service'
+	# 'sd-asahi-late-firmware.service'
+
+    # The script used by these services is also automatically added by add_systemd_unit
+ 
+    # add_binary '/usr/share/asahi-scripts/systemd/fwhooks'
+}
+
+# what needs to be appended:
+# the build function under the alias asahi_base_build, with the add_runscript line removed:
+# the help function, no alias
+# this bottom comment => '# vim: set ft=sh ts=4 sw=4 et:'
+# in total (the following is assuming that build() is @ line 4):
+# 	sed '1,2d;4s/build/asahi_base_build/;/add_runscript/d' initcpio/install/asahi >> initcpio/install/sd-asahi

@@ -1,0 +1,7 @@
+[Unit]
+Description=Asahi Early Firmware
+Before=systemd-udevd.service
+Requires=asahi-early-firmware.service
+
+[Install]
+WantedBy=sysinit.target

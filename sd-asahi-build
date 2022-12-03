@@ -1,0 +1,3 @@
+#!/bin/sh
+sed '1,2d;s/new_root/sysroot/g;$s/$/\n\n$1/' initcpio/hooks/asahi >> systemd/fwhooks
+sed '1,2d;4s/build/asahi_base_build/;/add_runscript/d' initcpio/install/asahi >> initcpio/install/sd-asahi
