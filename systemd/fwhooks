@@ -9,6 +9,10 @@ msg() {
 }
 
 early_load() {
+    run_earlyhook
+}
+
+late_mount() {
     msg ":: Asahi: Waiting until sysroot and vendorfw become available..."
 
     # initrd-fs.target does not exactly mean that sysroot is fully mounted, we need to wait for both of these to appear.
@@ -18,10 +22,6 @@ early_load() {
 	    [[ -d /sysroot/lib && -d /vendorfw ]] && break
     done
 
-    run_earlyhook
-}
-
-late_mount() {
     run_latehook
 }
 
