@@ -19,13 +19,16 @@ In most cases.
 ### Using the systemd hook instead of the usual hooks (udev ...)
 
 If the systemd hook is desired, several easy steps must be taken as root:
-	- Edit `/etc/mkinitcpio.conf` based on the fact that in a basic systemd configuration HOOKS should start with `(base systemd sd-asahi...`. systemd replaces udev, and the basehook is there for the reason that the overhead of writing a C binary for the sd-asahi process is unnecessary if we can rely on the shell provided by the base hook (even though systemd overrides most behaviour).
-	- `mv /etc/mkinitcpio.d/linux-asahi.preset{,.x} && mv /etc/mkinitcpio.d/linux-sd-asahi.preset{.x,}`
-	- `systemctl daemon reload` - just in case units have not been picked up
-	- `mkinitcpio -P && update-m1n1`
-	- If you are not using `/etc/default/update-m1n1`, you are done, otherwise you might need to move files or other after the last step.
 
-**WARNING:** Make sure you keep around at least 1 **WORKING** m1n1 stage 2 U-Boot + GRUB binary and 1 backup of your last working m1n1 stage 2 in the ESP such that you can mount ESP from mac os in the case of issues and boot normally again. The U-Boot and GRUB is there in the case you broke your initramfs or something else and need to recover from, say, Live USB.
+- Edit `/etc/mkinitcpio.conf` based on the fact that in a basic systemd configuration HOOKS should start with `(base systemd sd-asahi...`. systemd replaces udev, and the basehook is there for the reason that the overhead of writing a C binary for the sd-asahi process is unnecessary if we can rely on the shell provided by the base hook (even though systemd overrides most behaviour).
+- `mv /etc/mkinitcpio.d/linux-asahi.preset{,.x} && mv /etc/mkinitcpio.d/linux-sd-asahi.preset{.x,}`
+- `systemctl daemon reload` - just in case units have not been picked up
+- `mkinitcpio -P && update-m1n1`
+- If you are not using `/etc/default/update-m1n1`, you are done, otherwise you might need to move files or other after the last step.
+
+**WARNING:** 
+
+Make sure you keep around at least 1 **WORKING** m1n1 stage 2 U-Boot + GRUB binary and 1 backup of your last working m1n1 stage 2 in the ESP such that you can mount ESP from mac os in the case of issues and boot normally again. The U-Boot and GRUB is there in the case you broke your initramfs or something else and need to recover from, say, Live USB.
 
 ### Manually managing m1n1 upgrades
 
