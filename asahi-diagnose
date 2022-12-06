@@ -1,0 +1,170 @@
+#!/bin/sh
+
+log() {
+    echo "$@"
+}
+
+dt() {
+    p=/proc/device-tree/"$1"
+    if [ ! -e "$p" ]; then
+        echo "(missing)"
+    else
+        cat "$p" | tr "\0" " " | sed -e 's/ $//g'; echo
+    fi
+}
+
+banner() {
+    cat <<EOF
+# Asahi Linux System Diagnostic Dump
+
+    Collected at:   $(date) ($(date -Iseconds))
+    Username:       $(whoami)
+    Hostname:       $(hostname)
+
+EOF
+}
+
+device_info() {
+    cat <<EOF
+## Device information
+    Model:          $(dt model)
+    Compatible:     $(dt compatible)
+
+EOF
+}
+
+firmware_versions() {
+    cat <<EOF
+## Firmware versions
+    iBoot1:         $(dt chosen/asahi,iboot1-version)
+    iBoot2:         $(dt chosen/asahi,iboot2-version)
+    SFR:            $(dt chosen/asahi,system-fw-version)
+    OS firmware:    $(dt chosen/asahi,os-fw-version)
+    m1n1 stage 2:   $(dt chosen/asahi,m1n1-stage2-version)
+    U-Boot:         $(dt chosen/u-boot,version)
+
+EOF
+}
+
+boot_config() {
+    cat <<EOF
+## Boot information
+    ESP UUID:       $(dt chosen/asahi,efi-system-partition)
+    EFI:            $([ -e /sys/firmware/efi ] &&
+                       echo available || echo unavailable)
+
+EOF
+}
+
+system_info() {
+    cat <<EOF
+## System information
+    Kernel:         $(uname -r)
+    Kernel build:   $(uname -v)
+    Uptime:         $(uptime)
+    Kernel cmdline: $(cat /proc/cmdline)
+
+EOF
+}
+
+getfile() {
+    cat <<EOF
+## $2
+\`\`\`
+$(cat $1)
+\`\`\`
+
+EOF
+}
+
+cmd() {
+    cat <<EOF
+## $2
+\`\`\`
+$($1)
+\`\`\`
+
+EOF
+}
+
+
+package_versions() {
+    cat <<EOF
+## Package versions
+\`\`\`
+$(pacman -Q \
+    m1n1 uboot-asahi asahi-scripts asahi-meta asahi-desktop-meta \
+    asahi-fwextract asahi-configs alsa-ucm-conf-asahi \
+    asahilinux-keyring linux linux-asahi linux-asahi-edge \
+    mesa xorg-server pipewire kwin mutter \
+    2>/dev/null | uniq)
+\`\`\`
+
+EOF
+}
+
+module_parameters() {
+    echo "## Module parameters"
+    for mod in asahi hid_apple hid_magicmouse; do
+        [ ! -e /sys/module/$mod/parameters/ ] && continue
+        echo "    $mod"
+        for param in /sys/module/$mod/parameters/*; do
+            echo "        $(basename "$param")=$(cat "$param" | tr -d '\0')"
+        done
+        echo
+    done
+    echo
+}
+
+logfile() {
+    f="$1"
+    lines="$2"
+    [ -e "$1" ] || return
+    echo "## Log file: \`$f\`"
+    echo '```'
+    if [ -z "$lines" ]; then
+        cat "$f"
+    else
+        tail -n "$lines" "$f"
+    fi
+    echo '```'
+    echo
+}
+
+diagnose() {
+    f="$1"
+
+    >$f
+
+    log "Collecting system diagnostic information..."
+    log
+
+    (
+        exec >"$f" 2>&1
+        banner
+        device_info
+        firmware_versions
+        boot_config
+        system_info
+        getfile /proc/mounts "Mounts"
+        [ -e /etc/arch-release ] && package_versions
+        cmd lsblk "Block devices"
+        cmd lspci "PCI devices"
+        getfile /proc/bus/input/devices "Input devices"
+        cmd lsmod "Loaded modules"
+        module_parameters
+        cmd 'journalctl -b 0 -tkernel' "Kernel log"
+        logfile /var/log/Xorg.0.log
+        logfile /var/log/pacman.log 500
+    )
+
+    log "Saved diagnostic information to $f"
+}
+
+if [ -z "$1" ]; then
+    diagnose "$HOME/asahi-diagnose-$(date +%Y%m%d-%H%M%S).txt"
+elif [ "$1" = "-" ]; then
+    diagnose /dev/stdout
+else
+    diagnose "$1"
+fi
