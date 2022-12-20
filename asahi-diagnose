@@ -131,6 +131,12 @@ logfile() {
     echo
 }
 
+environment() {
+    echo "## Environment"
+    set | grep -E 'MESA|XDG_SESSION_TYPE|DISPLAY|ASAHI|TERM|LANG|LOCALE|LC_' | sed 's/^/    /'
+    echo
+}
+
 diagnose() {
     f="$1"
 
@@ -146,6 +152,7 @@ diagnose() {
         firmware_versions
         boot_config
         system_info
+        environment
         getfile /proc/mounts "Mounts"
         [ -e /etc/arch-release ] && package_versions
         cmd lsblk "Block devices"
