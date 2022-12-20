@@ -131,6 +131,12 @@ logfile() {
     echo
 }
 
+environment() {
+    echo "## Environment"
+    set | grep -E 'MESA|AGX|ASAHI|XDG_SESSION_TYPE|DISPLAY|TERM|LANG|LOCALE|LC_' | sed 's/^/    /'
+    echo
+}
+
 diagnose() {
     f="$1"
 
@@ -146,6 +152,7 @@ diagnose() {
         firmware_versions
         boot_config
         system_info
+        environment
         getfile /proc/mounts "Mounts"
         [ -e /etc/arch-release ] && package_versions
         cmd lsblk "Block devices"
@@ -159,6 +166,23 @@ diagnose() {
     )
 
     log "Saved diagnostic information to $f"
+
+    plat="$(cat /proc/device-tree/compatible | sed -re 's/.*apple,(t....).*/\1/g')"
+    ver="$(tr -d '\0' </proc/device-tree/chosen/asahi,os-fw-version)"
+    case "${plat}:${ver}" in
+        t8103:12.3*) ;;
+        t600[012]:12.3*) ;;
+        t8112:12.4*) ;;
+        *)
+            echo
+            echo "** WARNING! **"
+            echo "You are using an unsupported firmware version ($ver) on this platform ($plat)."
+            echo "This means you explicitly chose expert mode when installing Asahi Linux,"
+            echo "and then explicitly selected a non-default unsupported version."
+            echo "You are on your own. Please do not file bugs. We can't help you."
+            echo "Reinstall without using expert mode if you want support."
+            ;;
+    esac
 }
 
 if [ -z "$1" ]; then
