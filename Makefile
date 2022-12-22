@@ -40,6 +40,9 @@ install-sd-asahi: install
 	chmod +x sd-asahi-build
 	./sd-asahi-build
 	install -dD $(DESTDIR)/etc/mkinitcpio.d
+	install -dD $(DESTDIR)$(PREFIX)/lib/initcpio/install
+	install -dD $(DESTDIR)$(PREFIX)/lib/systemd/system
+	install -dD $(DESTDIR)$(PREFIX)/share/asahi-scripts
 	install -m0644 -t $(DESTDIR)/etc/mkinitcpio.d etc/mkinitcpio.d/*
 	install -m0644 -t $(DESTDIR)$(PREFIX)/lib/initcpio/install initcpio/install/sd-asahi
 	install -m0644 -t $(DESTDIR)$(PREFIX)/lib/systemd/system systemd/sd-asahi-*
