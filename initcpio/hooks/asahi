@@ -50,6 +50,7 @@ run_earlyhook() {
 }
 
 run_latehook() {
+    [ -e /vendorfw ] || return
     msg ":: Asahi: Copying vendor firmware to tmpfs under root filesystem..."
     mkdir -p /new_root/lib/firmware/vendor
     mount -t tmpfs vendorfw /new_root/lib/firmware/vendor
