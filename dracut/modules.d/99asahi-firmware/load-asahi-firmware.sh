@@ -45,3 +45,4 @@ fi
 
 ( cd /; cpio --quiet -i < "$VENDORFW/firmware.cpio" )
 info ":: Asahi firmware unpacked successfully"
+umount /run/.system-efi
