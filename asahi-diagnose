@@ -19,7 +19,7 @@ banner() {
 
     Collected at:   $(date) ($(date -Iseconds))
     Username:       $(whoami)
-    Hostname:       $(hostname)
+    Hostname:       $(hostnamectl hostname)
 
 EOF
 }
