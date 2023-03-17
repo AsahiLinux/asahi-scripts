@@ -169,20 +169,28 @@ diagnose() {
 
     plat="$(cat /proc/device-tree/compatible | sed -re 's/.*apple,(t....).*/\1/g')"
     ver="$(tr -d '\0' </proc/device-tree/chosen/asahi,os-fw-version)"
-    case "${plat}:${ver}" in
-        t8103:12.3*) ;;
-        t600[012]:12.3*) ;;
-        t8112:12.4*) ;;
-        *)
-            echo
-            echo "** WARNING! **"
-            echo "You are using an unsupported firmware version ($ver) on this platform ($plat)."
-            echo "This means you explicitly chose expert mode when installing Asahi Linux,"
-            echo "and then explicitly selected a non-default unsupported version."
-            echo "You are on your own. Please do not file bugs. We can't help you."
-            echo "Reinstall without using expert mode if you want support."
-            ;;
-    esac
+
+    if [ $? != 0 ]; then
+      echo
+      echo "WARNING: Unable to get firmware version from DT. Is m1n1 up-to-date?"
+      echo "Consider running update-m1n1."
+    else
+      case "${plat}:${ver}" in
+          t8103:12.3*) ;;
+          t600[012]:12.3*) ;;
+          t8112:12.4*) ;;
+          *)
+              echo
+              echo "** WARNING! **"
+              echo "You are using an unsupported firmware version ($ver) on this platform ($plat)."
+              echo "This means you explicitly chose expert mode when installing Asahi Linux,"
+              echo "and then explicitly selected a non-default unsupported version."
+              echo "You are on your own. Please do not file bugs. We can't help you."
+              echo "Reinstall without using expert mode if you want support."
+              ;;
+      esac
+    fi
+
 }
 
 if [ -z "$1" ]; then
