@@ -1,0 +1,20 @@
+#!/usr/bin/sh
+# SPDX-License-Identifier: MIT
+
+PREREQ=""
+prereqs()
+{
+        echo "$PREREQ"
+}
+case $1 in
+# get pre-requisites
+prereqs)
+        prereqs
+        exit 0
+        ;;
+esac
+
+. /scripts/functions
+
+mount -t tmpfs -o mode=0755 vendorfw "${rootmnt}"/lib/firmware/vendor
+cp -r /vendorfw/* /vendorfw/.vendorfw.manifest "${rootmnt}"/lib/firmware/vendor
