@@ -50,7 +50,7 @@ EOF
 echo "Installing GRUB files..."
 mkdir -p "$GRUB_DIR"
 touch "$GRUB_DIR"/device.map
-dd if=/dev/zero of="$GRUB_DIR"/grubenv bs=1024 count=1 2>/dev/null
+grub-editenv "$GRUB_DIR"/grubenv create
 cp -r /usr/share/grub/themes "$GRUB_DIR"
 cp -r /usr/lib/grub/arm64-efi "$GRUB_DIR"
 rm -f "$GRUB_DIR"/arm64-efi/*.module
