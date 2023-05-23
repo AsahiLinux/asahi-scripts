@@ -3,12 +3,14 @@
 
 set -eu
 
+unset PYTHON
+
 [ -e /etc/default/asahi-fwextract ] && . /etc/default/asahi-fwextract
 
 : "${ASAHIFW:=}"
 : "${VENDORFW:=}"
 : "${VENDORFWTMP:=/run/.vendorfw-tmp}"
-: "${PYTHON:=python3}"
+: "${PYTHON:=/usr/bin/python3}"
 
 if [ -e "$(dirname "$0")"/functions.sh ]; then
     . "$(dirname "$0")"/functions.sh
