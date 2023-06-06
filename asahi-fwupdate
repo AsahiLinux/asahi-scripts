@@ -23,7 +23,7 @@ umount=false
 if [ -z "$ASAHIFW" ] && [ -z "$VENDORFW" ]; then
     mount_sys_esp /run/.system-efi
     ASAHIFW="/run/.system-efi/asahi/"
-    VENDORFW="/run/.system-efi/vendorfw/"
+    VENDORFW="/run/.system-efi/vendorfw"
     umount=true
 fi
 
@@ -42,8 +42,11 @@ fi
 
 echo "Upgrading vendor firmware package"
 asahi-fwextract "$ASAHIFW" "$VENDORFWTMP"
-mv -f ${VENDORFWTMP}/* "$VENDORFW"
-rmdir "$VENDORFWTMP"
+rm -rf "$VENDORFW".new
+mv "${VENDORFWTMP}" "$VENDORFW".new
+rm -rf "$VENDORFW"
+mv "$VENDORFW".new "$VENDORFW"
+rm -rf "$VENDORFWTMP"
 echo "Firmware upgraded"
 
 $umount && umount /run/.system-efi
