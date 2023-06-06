@@ -5,7 +5,7 @@ set -eu
 
 unset PYTHON
 
-[ -e /etc/default/asahi-fwextract ] && . /etc/default/asahi-fwextract
+[ -e /etc/default/asahi-fwupdate ] && . /etc/default/asahi-fwupdate
 
 : "${ASAHIFW:=}"
 : "${VENDORFW:=}"
@@ -41,7 +41,7 @@ if [ ! -d "$VENDORFWTMP" ]; then
 fi
 
 echo "Upgrading vendor firmware package"
-"$PYTHON" -m asahi_firmware.update "$ASAHIFW" "$VENDORFWTMP"
+asahi-fwextract "$ASAHIFW" "$VENDORFWTMP"
 mv -f ${VENDORFWTMP}/* "$VENDORFW"
 rmdir "$VENDORFWTMP"
 echo "Firmware upgraded"
