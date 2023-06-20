@@ -3,12 +3,14 @@
 
 set -eu
 
-[ -e /etc/default/asahi-fwextract ] && . /etc/default/asahi-fwextract
+unset PYTHON
+
+[ -e /etc/default/asahi-fwupdate ] && . /etc/default/asahi-fwupdate
 
 : "${ASAHIFW:=}"
 : "${VENDORFW:=}"
 : "${VENDORFWTMP:=/run/.vendorfw-tmp}"
-: "${PYTHON:=python3}"
+: "${PYTHON:=/usr/bin/python3}"
 
 if [ -e "$(dirname "$0")"/functions.sh ]; then
     . "$(dirname "$0")"/functions.sh
@@ -21,7 +23,7 @@ umount=false
 if [ -z "$ASAHIFW" ] && [ -z "$VENDORFW" ]; then
     mount_sys_esp /run/.system-efi
     ASAHIFW="/run/.system-efi/asahi/"
-    VENDORFW="/run/.system-efi/vendorfw/"
+    VENDORFW="/run/.system-efi/vendorfw"
     umount=true
 fi
 
@@ -39,9 +41,12 @@ if [ ! -d "$VENDORFWTMP" ]; then
 fi
 
 echo "Upgrading vendor firmware package"
-"$PYTHON" -m asahi_firmware.update "$ASAHIFW" "$VENDORFWTMP"
-mv -f ${VENDORFWTMP}/* "$VENDORFW"
-rmdir "$VENDORFWTMP"
+asahi-fwextract "$ASAHIFW" "$VENDORFWTMP"
+rm -rf "$VENDORFW".new
+mv "${VENDORFWTMP}" "$VENDORFW".new
+rm -rf "$VENDORFW"
+mv "$VENDORFW".new "$VENDORFW"
+rm -rf "$VENDORFWTMP"
 echo "Firmware upgraded"
 
 $umount && umount /run/.system-efi
