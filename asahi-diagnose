@@ -161,6 +161,7 @@ diagnose() {
         cmd lsmod "Loaded modules"
         module_parameters
         cmd 'journalctl -b 0 -tkernel' "Kernel log"
+        cmd 'journalctl -b -1 -tkernel' "Kernel log (last boot)"
         logfile /var/log/Xorg.0.log
         logfile /var/log/pacman.log 500
     )
