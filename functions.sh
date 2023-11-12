@@ -24,7 +24,7 @@ mount_sys_esp() {
     mountpoint="$1"
 
     mkdir -p "$mountpoint"
-    while grep -q "$mountpoint" /proc/mounts; do
+    while grep -q " $mountpoint " /proc/mounts; do
         umount "$mountpoint"
     done
 
@@ -54,7 +54,7 @@ mount_boot_esp() {
     mountpoint="$1"
 
     mkdir -p "$mountpoint"
-    while grep -q "$mountpoint" /proc/mounts; do
+    while grep -q " $mountpoint " /proc/mounts; do
         umount "$mountpoint"
     done
 
