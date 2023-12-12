@@ -59,6 +59,7 @@ EOF
 system_info() {
     cat <<EOF
 ## System information
+    Distro:         $(awk -F= '/PRETTY_NAME/ { gsub(/"/, "", $2); print $2 }' /etc/os-release)
     Kernel:         $(uname -r)
     Kernel build:   $(uname -v)
     Uptime:         $(uptime)
@@ -89,15 +90,26 @@ EOF
 
 
 package_versions() {
+    echo "## Package versions"
+    if [ -e /etc/arch-release ]; then
+      cmd="pacman -Q"
+      pkgs="m1n1 uboot-asahi asahi-scripts asahi-meta asahi-desktop-meta
+            asahi-fwextract asahi-configs alsa-ucm-conf-asahi
+            asahilinux-keyring linux linux-asahi linux-asahi-edge
+            mesa xorg-server pipewire kwin mutter"
+    elif [ -e /etc/fedora-release ]; then
+      cmd="rpm -q"
+      pkgs="m1n1 alsa-ucm-asahi asahi-platform-metapackage asahi-repos
+            fedora-asahi-remix-scripts tiny-dfr uboot-images-armv8 kernel-16k
+            kernel-16k-modules-extra asahi-fwextract dracut-asahi update-m1n1
+            asahi-audio speakersafetyd wireplumber pipewire mesa"
+    else
+      echo "Distribution not supported"
+      return
+    fi
     cat <<EOF
-## Package versions
 \`\`\`
-$(pacman -Q \
-    m1n1 uboot-asahi asahi-scripts asahi-meta asahi-desktop-meta \
-    asahi-fwextract asahi-configs alsa-ucm-conf-asahi \
-    asahilinux-keyring linux linux-asahi linux-asahi-edge \
-    mesa xorg-server pipewire kwin mutter \
-    2>/dev/null | uniq)
+$($cmd $pkgs 2>/dev/null | sort -u)
 \`\`\`
 
 EOF
@@ -154,7 +166,7 @@ diagnose() {
         system_info
         environment
         getfile /proc/mounts "Mounts"
-        [ -e /etc/arch-release ] && package_versions
+        package_versions
         cmd lsblk "Block devices"
         cmd lspci "PCI devices"
         getfile /proc/bus/input/devices "Input devices"
@@ -189,6 +201,34 @@ diagnose() {
             echo "Reinstall without using expert mode if you want support."
             ;;
     esac
+
+    if [ -e /etc/fedora-release ]; then
+        if uname -r | grep -qv '+16k$'; then
+            echo
+            echo "** WARNING! **"
+            echo "Your system is not running a 16k page kernel. This is unsupported and will not"
+            echo "work properly; see https://discussion.fedoraproject.org/t/87711 for how to fix."
+        elif [ ! -e /etc/sysconfig/kernel ]; then
+            echo
+            echo "** WARNING! **"
+            echo "/etc/sysconfig/kernel is missing, kernel updates may not install properly"
+            echo "See https://discussion.fedoraproject.org/t/87711/3 for how to fix."
+        elif grep -q DEFAULTKERNEL=kernel-core /etc/sysconfig/kernel; then
+            echo
+            echo "** WARNING! **"
+            echo "/etc/sysconfig/kernel is setting a 4k kernel as default; this is unsupported"
+            echo "and will not work properly; see https://discussion.fedoraproject.org/t/87711"
+            echo "for how to fix."
+        fi
+
+        if ! rpm -q asahi-platform-metapackage > /dev/null 2>&1; then
+            echo
+            echo "** WARNING! **"
+            echo "The asahi-platform-metapackage package is not installed, you may be missing"
+            echo "required platform dependencies. See https://discussion.fedoraproject.org/t/95301"
+            echo "for how to fix it."
+        fi
+    fi
 }
 
 if [ -z "$1" ]; then
