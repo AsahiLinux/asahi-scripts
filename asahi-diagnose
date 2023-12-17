@@ -255,7 +255,7 @@ diagnose() {
 
     if [ "$pro_audio" == "yes" ] || \
        [ "$old_conf" == "yes" ] || \
-       [ "$racy_build" == "yes" ] \
+       [ "$racy_build" == "yes" ] || \
        [ "$bad_macaudio_params" == "yes" ] || \
        [ "$tas2764_quirks" == "no" ]; then
         echo
