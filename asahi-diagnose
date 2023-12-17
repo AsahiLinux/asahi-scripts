@@ -69,6 +69,14 @@ EOF
 }
 
 
+# Check pipewire profile
+check_macaudio_profile() {
+    local profile_config="${HOME}/.local/state/wireplumber/default-profile"
+    [ -e  ${profile_config} ] \
+    && grep alsa_card.platform-sound ${profile_config} | sed -e 's/.*=//' \
+    || echo "none"
+}
+macaudio_profile=$(check_macaudio_profile)
 
 # Check for the Pro Audio profile (installed before early 2023)
 check_proaudio() {
@@ -116,6 +124,7 @@ tas2764_quirks=$(check_audio_tas2764)
 audio_config() {
     cat <<EOF
 ## Audio Configuration:
+    Default profile: $macaudio_profile
     Pro Audio profile detected: $pro_audio
     Old configuration files in \`/etc/\`: $old_conf
     File conflicts in \`/usr/share/\`: $racy_build
@@ -237,6 +246,12 @@ diagnose() {
     )
 
     log "Saved diagnostic information to $f"
+
+    if [ "$macaudio_profile" != "HiFi" ]; then
+        echo
+        echo "Pipewire macaudio profile is \"${macaudio_profile}\"."
+        echo "Headphones and speakers will not work. Select the \"Default\" or \"HiFi\" profile."
+    fi
 
     if [ "$pro_audio" == "yes" ] || \
        [ "$old_conf" == "yes" ] || \
