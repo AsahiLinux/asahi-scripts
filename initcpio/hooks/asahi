@@ -15,6 +15,7 @@ run_earlyhook() {
     msg ":: Asahi: Triggering early load of NVMe modules..."
     modprobe apple-mailbox
     modprobe nvme-apple
+    modprobe xhci-plat-hcd
 
     for i in $(seq 0 50); do
         [ -e /sys/bus/platform/drivers/nvme-apple/*.nvme/nvme/nvme*/nvme*n1/ ] && break
