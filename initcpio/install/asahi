@@ -18,7 +18,7 @@ build() {
 
     # For USB
     map add_module i2c-apple? tps6598x? apple-dart? dwc3? dwc3-of-simple? \
-        nvmem-apple-efuses? phy-apple-atc? xhci-pci? pcie-apple? gpio_macsmc?
+        nvmem-apple-efuses? phy-apple-atc? xhci-plat-hcd? xhci-pci? pcie-apple? gpio_macsmc?
 
     # For HID
     map add_module spi-apple? spi-hid-apple? spi-hid-apple-of?
