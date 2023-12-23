@@ -54,7 +54,18 @@ install-arch: install install-mkinitcpio
 	install -dD $(DESTDIR)$(PREFIX)/share/libalpm/hooks
 	install -m0644 -t $(DESTDIR)$(PREFIX)/share/libalpm/hooks libalpm/hooks/95-m1n1-install.hook
 
+install-initramfs: install
+	install -d $(DESTDIR)/etc/initramfs-tools/hooks/
+	install -m0755 -t $(DESTDIR)/etc/initramfs-tools/hooks/ initramfs/hooks/asahi
+	install -d $(DESTDIR)/etc/initramfs-tools/scripts/init-top
+	install -m0755 -t $(DESTDIR)/etc/initramfs-tools/scripts/init-top initramfs/scripts/init-top/asahi
+	install -d $(DESTDIR)/etc/initramfs-tools/scripts/init-bottom
+	install -m0755 -t $(DESTDIR)/etc/initramfs-tools/scripts/init-bottom initramfs/scripts/init-bottom/asahi
+	install -m0644 -t $(DESTDIR)$(PREFIX)/share/asahi-scripts initramfs/modules
+
 install-fedora: install install-dracut
+
+install-ubuntu: install install-initramfs
 
 uninstall:
 	rm -f $(addprefix $(DESTDIR)$(BIN_DIR)/,$(SCRIPTS))
@@ -67,6 +78,11 @@ uninstall-mkinitcpio:
 uninstall-dracut:
 	rm -f $(DESTDIR)$(DRACUT_CONF_DIR)/10-asahi.conf
 
+uninstall-initramfs:
+	rm -f $(DESTDIR)/etc/initramfs-tools/hooks/asahi
+	rm -f $(DESTDIR)/etc/initramfs-tools/scripts/init-top/asahi
+	rm -f $(DESTDIR)/etc/initramfs-tools/scripts/init-bottom/asahi
+
 uninstall-arch: uninstall-mkinitcpio
 	rm -f $(addprefix $(DESTDIR)$(BIN_DIR)/,$(ARCH_SCRIPTS))
 	rm -f $(addprefix $(DESTDIR)$(PREFIX)/lib/systemd/system/,$(UNITS))
@@ -74,5 +90,7 @@ uninstall-arch: uninstall-mkinitcpio
 	rm -f $(DESTDIR)$(PREFIX)/share/libalpm/hooks/95-m1n1-install.hook
 
 uninstall-fedora: uninstall-dracut
+
+uninstall-ubuntu: uninstall-initramfs
 
 .PHONY: clean install install-mkinitcpio install-dracut install-arch install-fedora uninstall uninstall-mkinitcpio uninstall-dracut uninstall-arch uninstall-fedora

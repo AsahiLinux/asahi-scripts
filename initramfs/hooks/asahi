@@ -1,0 +1,27 @@
+#!/bin/sh
+# SPDX-License-Identifier: MIT
+
+PREREQ=""
+
+prereqs()
+{
+        echo "$PREREQ"
+}
+
+case $1 in
+prereqs)
+        prereqs
+        exit 0
+        ;;
+esac
+
+# Hooks for loading asahi modules and firmware
+
+. /usr/share/initramfs-tools/hook-functions
+
+mkdir -p "${DESTDIR}/lib/firmware"
+mkdir -p "${DESTDIR}/usr/share/asahi-scripts"
+cp -r /usr/share/asahi-scripts/* "${DESTDIR}/usr/share/asahi-scripts"
+copy_exec /usr/bin/cpio
+
+add_modules_from_file /usr/share/asahi-scripts/modules
