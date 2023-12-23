@@ -74,7 +74,7 @@ check_macaudio_profile() {
     local profile_config="${HOME}/.local/state/wireplumber/default-profile"
     [ -e  ${profile_config} ] \
     && grep alsa_card.platform-sound ${profile_config} | sed -e 's/.*=//' \
-    || echo "none"
+    || echo "Default"
 }
 macaudio_profile=$(check_macaudio_profile)
 
@@ -247,7 +247,7 @@ diagnose() {
 
     log "Saved diagnostic information to $f"
 
-    if [ "$macaudio_profile" != "HiFi" ]; then
+    if [ "$macaudio_profile" != "HiFi" -a "$macaudio_profile" != "Default" ]; then
         echo
         echo "Pipewire macaudio profile is \"${macaudio_profile}\"."
         echo "Headphones and speakers will not work. Select the \"Default\" or \"HiFi\" profile."
