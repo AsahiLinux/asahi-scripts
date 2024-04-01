@@ -30,7 +30,7 @@ install() {
     asahiscriptsdir="/usr/share/asahi-scripts"
     inst_dir $asahiscriptsdir
     $DRACUT_CP -R -L -t "${initdir}/${asahiscriptsdir}" "${dracutsysrootdir}${asahiscriptsdir}"/*
-    inst_multiple cpio cut dirname modprobe mount seq sleep umount
+    inst_multiple cpio cut dirname grep mkdir modprobe mount seq sleep umount
     inst_hook pre-udev 10 "${moddir}/load-asahi-firmware.sh"
     inst_hook cleanup 99 "${moddir}/install-asahi-firmware.sh"
 }
