@@ -39,6 +39,8 @@ install-mkinitcpio: install
 install-dracut: install
 	install -dD $(DESTDIR)$(DRACUT_CONF_DIR)
 	install -m0644 -t $(DESTDIR)$(DRACUT_CONF_DIR) dracut/dracut.conf.d/10-asahi.conf
+	install -dD $(DESTDIR)$(DRACUT_MODULES_DIR)/91kernel-modules-asahi
+	install -m0755 -t $(DESTDIR)$(DRACUT_MODULES_DIR)/91kernel-modules-asahi dracut/modules.d/91kernel-modules-asahi/module-setup.sh
 	install -dD $(DESTDIR)$(DRACUT_MODULES_DIR)/99asahi-firmware
 	install -m0755 -t $(DESTDIR)$(DRACUT_MODULES_DIR)/99asahi-firmware dracut/modules.d/99asahi-firmware/install-asahi-firmware.sh
 	install -m0755 -t $(DESTDIR)$(DRACUT_MODULES_DIR)/99asahi-firmware dracut/modules.d/99asahi-firmware/load-asahi-firmware.sh
