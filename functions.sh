@@ -43,7 +43,7 @@ mount_sys_esp() {
         mount --bind "$bootmnt" "$mountpoint"
         warn "System ESP not identified in device tree, using $bootmnt"
     else
-        mount "PARTUUID=$esp_uuid" "$mountpoint"
+        mount "/dev/disk/by-partuuid/$esp_uuid" "$mountpoint"
     fi
     dev="$(grep "$mountpoint" /proc/mounts | cut -d" " -f1)"
     info "Mounted System ESP $dev at $mountpoint"
@@ -72,7 +72,7 @@ mount_boot_esp() {
             return 1
         fi
 
-        mount "PARTUUID=$esp_uuid" "$mountpoint"
+        mount "/dev/disk/by-partuuid/$esp_uuid" "$mountpoint"
     fi
     info "Mounted Boot ESP at $mountpoint"
 }
