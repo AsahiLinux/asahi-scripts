@@ -253,22 +253,22 @@ diagnose() {
         echo "Headphones and speakers will not work. Select the \"Default\" or \"HiFi\" profile."
     fi
 
-    if [ "$pro_audio" == "yes" ] || \
-       [ "$old_conf" == "yes" ] || \
-       [ "$racy_build" == "yes" ] || \
-       [ "$bad_macaudio_params" == "yes" ] || \
-       [ "$tas2764_quirks" == "no" ]; then
+    if [ "$pro_audio" = "yes" ] || \
+       [ "$old_conf" = "yes" ] || \
+       [ "$racy_build" = "yes" ] || \
+       [ "$bad_macaudio_params" = "yes" ] || \
+       [ "$tas2764_quirks" = "no" ]; then
         echo
         echo "!! IMPORTANT !!"
         echo "Your audio configuration is in an invalid state. It is likely that you tried to"
         echo "enable speakers early, despite numerous and very explicit warnings not to do so."
         echo "Potential reason(s) you are seeing this message: "
         (
-            [ "$pro_audio" == "yes" ] && echo "    - The Pro Audio profile is/was enabled for the internal speakers."
-            [ "$old_conf" == "yes" ] && echo "    - You have files in /etc/ from a prerelease version of asahi-audio."
-            [ "$racy_build" == "yes" ] && echo "    - You have files in /usr/share/ from a prerelease version of asahi-audio."
-            [ "$bad_macaudio_params" == "yes" ] && echo "    - You have tried to manually circumvent our kernel-level safety controls."
-            [ "$tas2764_quirks" == "no" ] && echo "    - Required speaker codec settings are not being applied."
+            [ "$pro_audio" = "yes" ] && echo "    - The Pro Audio profile is/was enabled for the internal speakers."
+            [ "$old_conf" = "yes" ] && echo "    - You have files in /etc/ from a prerelease version of asahi-audio."
+            [ "$racy_build" = "yes" ] && echo "    - You have files in /usr/share/ from a prerelease version of asahi-audio."
+            [ "$bad_macaudio_params" = "yes" ] && echo "    - You have tried to manually circumvent our kernel-level safety controls."
+            [ "$tas2764_quirks" = "no" ] && echo "    - Required speaker codec settings are not being applied."
         )
         echo "Please go to https://github.com/AsahiLinux/docs/wiki/Undoing-early-speaker-support-hacks for fixes."
         echo "Do NOT file audio-related bugs until you have tried ALL fixes suggested at the page above."
