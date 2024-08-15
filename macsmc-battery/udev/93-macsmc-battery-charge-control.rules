@@ -1,0 +1,12 @@
+# load stored charge_control_end_threshold
+SUBSYSTEM=="power_supply", KERNEL=="macsmc-battery", IMPORT{file}="/etc/udev/$kernel.conf"
+SUBSYSTEM=="power_supply", KERNEL=="macsmc-battery", ENV{CHARGE_CONTROL_END_THRESHOLD}=="[0-9][0-9]", GOTO="set_charge_control_end_threshold"
+
+GOTO="skip_charge_control_end_threshold"
+LABEL="set_charge_control_end_threshold"
+SUBSYSTEM=="power_supply", KERNEL=="macsmc-battery", ATTR{charge_control_end_threshold}="$env{CHARGE_CONTROL_END_THRESHOLD}"
+LABEL="skip_charge_control_end_threshold"
+
+# enable monitoring via a systemd path unit
+SUBSYSTEM=="power_supply", KERNEL=="macsmc-battery", TAG+="systemd"
+SUBSYSTEM=="power_supply", KERNEL=="macsmc-battery", ENV{SYSTEMD_WANTS}="macsmc-battery-charge-control-end-threshold.path"

@@ -1,0 +1,5 @@
+[Unit]
+Description=Monitor charge_control_end_threshold
+
+[Path]
+PathChanged=/sys/class/power_supply/macsmc-battery/charge_control_end_threshold

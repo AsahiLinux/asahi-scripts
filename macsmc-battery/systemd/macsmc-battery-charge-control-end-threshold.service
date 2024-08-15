@@ -1,0 +1,7 @@
+[Unit]
+Description=Store current charge_control_end_threshold value persistently
+
+[Service]
+Type=simple
+ExecStart=/usr/bin/sed -e 's/^/CHARGE_CONTROL_END_THRESHOLD=/' /sys/class/power_supply/macsmc-battery/charge_control_end_threshold
+StandardOutput=truncate:/etc/udev/macsmc-battery.conf
