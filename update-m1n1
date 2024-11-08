@@ -17,8 +17,12 @@ fi
 : ${M1N1:="$SOURCE/m1n1.bin"}
 : ${U_BOOT:="$SOURCE/u-boot-nodtb.bin"}
 : ${TARGET:="$1"}
-: ${DTBS:=$(/bin/ls -d /lib/modules/*-ARCH | sort -rV | head -1)/dtbs/*.dtb}
 : ${CONFIG:=/etc/m1n1.conf}
+
+if [ -z "$DTBS" ]; then
+    warn "ERROR: DTBS config unset or empty, see `/etc/default/update-m1n1`"
+    exit 1
+fi
 
 umount=false
 
