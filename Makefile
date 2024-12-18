@@ -55,7 +55,7 @@ install-macsmc-battery: install
 	install -m0755 -t $(DESTDIR)$(SYSTEMD_UNIT_DIR) macsmc-battery/systemd/macsmc-battery-charge-control-end-threshold.service
 	install -m0755 -t $(DESTDIR)$(UDEV_RULES_DIR) macsmc-battery/udev/93-macsmc-battery-charge-control.rules
 
-install-arch: install install-mkinitcpio
+install-arch: install install-mkinitcpio install-macsmc-battery
 	install -m0755 -t $(DESTDIR)$(BIN_DIR)/ $(BUILD_ARCH_SCRIPTS)
 	install -dD $(DESTDIR)$(PREFIX)/lib/systemd/system
 	install -dD $(DESTDIR)$(PREFIX)/lib/systemd/system/{multi-user,sysinit}.target.wants
@@ -83,7 +83,7 @@ uninstall-macsmc-battery:
 	rm -f $(DESTDIR)$(SYSTEMD_UNIT_DIR)/macsmc-battery-charge-control-end-threshold.service
 	rm -f $(DESTDIR)$(UDEV_RULES_DIR)/93-macsmc-battery-charge-control.rules
 
-uninstall-arch: uninstall-mkinitcpio
+uninstall-arch: uninstall-mkinitcpio uninstall-macsmc-battery
 	rm -f $(addprefix $(DESTDIR)$(BIN_DIR)/,$(ARCH_SCRIPTS))
 	rm -f $(addprefix $(DESTDIR)$(PREFIX)/lib/systemd/system/,$(UNITS))
 	rm -f $(addprefix $(DESTDIR)$(PREFIX)/lib/systemd/system/multi-user.target.wants/,$(MULTI_USER_WANTS))
