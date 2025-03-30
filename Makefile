@@ -90,4 +90,16 @@ uninstall-arch: uninstall-mkinitcpio uninstall-macsmc-battery
 
 uninstall-fedora: uninstall-dracut uninstall-macsmc-battery
 
-.PHONY: clean install install-mkinitcpio install-dracut install-arch install-fedora uninstall uninstall-mkinitcpio uninstall-dracut uninstall-arch uninstall-fedora
+.PHONY: clean \
+        install \
+        install-mkinitcpio \
+        install-dracut \
+        install-macsmc-battery \
+        install-arch \
+        install-fedora \
+        uninstall \
+        uninstall-mkinitcpio \
+        uninstall-dracut \
+        uninstall-macsmc-battery \
+        uninstall-arch \
+        uninstall-fedora
