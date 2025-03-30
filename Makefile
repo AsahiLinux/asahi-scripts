@@ -10,6 +10,7 @@ DRACUT_CONF_DIR=$(PREFIX)/lib/dracut/dracut.conf.d
 DRACUT_MODULES_DIR=$(PREFIX)/lib/dracut/modules.d
 SYSTEMD_UNIT_DIR=$(PREFIX)/lib/systemd/system
 UDEV_RULES_DIR=$(PREFIX)/lib/udev/rules.d
+UDEV_RULES_DIR=$(PREFIX)/lib/udev/hwdb.d
 BUILD_SCRIPTS=$(addprefix build/,$(SCRIPTS))
 BUILD_ARCH_SCRIPTS=$(addprefix build/,$(ARCH_SCRIPTS))
 
@@ -54,7 +55,11 @@ install-macsmc-battery: install
 	install -m0755 -t $(DESTDIR)$(SYSTEMD_UNIT_DIR) macsmc-battery/systemd/macsmc-battery-charge-control-end-threshold.service
 	install -m0644 -t $(DESTDIR)$(UDEV_RULES_DIR) macsmc-battery/udev/93-macsmc-battery-charge-control.rules
 
-install-arch: install install-mkinitcpio install-macsmc-battery
+install-udev-hwdb: install
+	install -dD $(DESTDIR)$(UDEV_HWDB_DIR)
+	install -m0644 -t $(DESTDIR)$(UDEV_HWDB_DIR) udev/hwdb.d/65-autosuspend-override-asahi-sdhci.hwdb
+
+install-arch: install install-mkinitcpio install-macsmc-battery install-udev-hwdb
 	install -m0755 -t $(DESTDIR)$(BIN_DIR)/ $(BUILD_ARCH_SCRIPTS)
 	install -dD $(DESTDIR)$(PREFIX)/lib/systemd/system
 	install -dD $(DESTDIR)$(PREFIX)/lib/systemd/system/{multi-user,sysinit}.target.wants
@@ -64,7 +69,7 @@ install-arch: install install-mkinitcpio install-macsmc-battery
 	install -dD $(DESTDIR)$(PREFIX)/share/libalpm/hooks
 	install -m0644 -t $(DESTDIR)$(PREFIX)/share/libalpm/hooks libalpm/hooks/95-m1n1-install.hook
 
-install-fedora: install install-dracut install-macsmc-battery
+install-fedora: install install-dracut install-macsmc-battery install-udev-hwdb
 
 uninstall:
 	rm -f $(addprefix $(DESTDIR)$(BIN_DIR)/,$(SCRIPTS))
@@ -82,24 +87,29 @@ uninstall-macsmc-battery:
 	rm -f $(DESTDIR)$(SYSTEMD_UNIT_DIR)/macsmc-battery-charge-control-end-threshold.service
 	rm -f $(DESTDIR)$(UDEV_RULES_DIR)/93-macsmc-battery-charge-control.rules
 
-uninstall-arch: uninstall-mkinitcpio uninstall-macsmc-battery
+uninstall-udev-hwdb:
+	rm -f $(DESTDIR)$(UDEV_HWDB_DIR)/65-autosuspend-override-asahi-sdhci.hwdb
+
+uninstall-arch: uninstall-mkinitcpio uninstall-macsmc-battery uninstall-udev-hwdb
 	rm -f $(addprefix $(DESTDIR)$(BIN_DIR)/,$(ARCH_SCRIPTS))
 	rm -f $(addprefix $(DESTDIR)$(PREFIX)/lib/systemd/system/,$(UNITS))
 	rm -f $(addprefix $(DESTDIR)$(PREFIX)/lib/systemd/system/multi-user.target.wants/,$(MULTI_USER_WANTS))
 	rm -f $(DESTDIR)$(PREFIX)/share/libalpm/hooks/95-m1n1-install.hook
 
-uninstall-fedora: uninstall-dracut uninstall-macsmc-battery
+uninstall-fedora: uninstall-dracut uninstall-macsmc-battery uninstall-udev-hwdb
 
 .PHONY: clean \
         install \
         install-mkinitcpio \
         install-dracut \
         install-macsmc-battery \
+        install-udev-hwdb \
         install-arch \
         install-fedora \
         uninstall \
         uninstall-mkinitcpio \
         uninstall-dracut \
         uninstall-macsmc-battery \
+        uninstall-udev-hwdb \
         uninstall-arch \
         uninstall-fedora
