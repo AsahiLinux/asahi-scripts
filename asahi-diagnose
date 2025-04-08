@@ -270,7 +270,7 @@ diagnose() {
             [ "$bad_macaudio_params" = "yes" ] && echo "    - You have tried to manually circumvent our kernel-level safety controls."
             [ "$tas2764_quirks" = "no" ] && echo "    - Required speaker codec settings are not being applied."
         )
-        echo "Please go to https://github.com/AsahiLinux/docs/wiki/Undoing-early-speaker-support-hacks for fixes."
+        echo "Please go to https://asahilinux.org/docs/sw/undoing-early-speaker-hacks/ for fixes."
         echo "Do NOT file audio-related bugs until you have tried ALL fixes suggested at the page above."
         echo "Your bugs will be ignored and you will not be assisted."
     fi
