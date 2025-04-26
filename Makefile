@@ -10,7 +10,7 @@ DRACUT_CONF_DIR=$(PREFIX)/lib/dracut/dracut.conf.d
 DRACUT_MODULES_DIR=$(PREFIX)/lib/dracut/modules.d
 SYSTEMD_UNIT_DIR=$(PREFIX)/lib/systemd/system
 UDEV_RULES_DIR=$(PREFIX)/lib/udev/rules.d
-UDEV_RULES_DIR=$(PREFIX)/lib/udev/hwdb.d
+UDEV_HWDB_DIR=$(PREFIX)/lib/udev/hwdb.d
 BUILD_SCRIPTS=$(addprefix build/,$(SCRIPTS))
 BUILD_ARCH_SCRIPTS=$(addprefix build/,$(ARCH_SCRIPTS))
 
