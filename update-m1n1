@@ -56,7 +56,14 @@ cat "$M1N1" $DTBS >"${TARGET}.new"
 gzip -c "$U_BOOT" >>"${TARGET}.new"
 cat "$m1n1config" >>"${TARGET}.new"
 
-[ -e "$TARGET" ] && mv -f "$TARGET" "${TARGET}.old"
+if [ -e "$TARGET" ]; then
+    # clobber "${TARGET}.old" only if "$TARGET" changes, use sha512sum to
+    # avoid dependency on diffutils
+    SHA512_CUR=$(sha512sum "$TARGET"     | cut -d' ' -f1)
+    SHA512_NEW=$(sha512sum "$TARGET.new" | cut -d' ' -f1)
+    [ "$SHA512_CUR" != "$SHA512_NEW" ] && mv -f "$TARGET" "${TARGET}.old"
+fi
+
 mv -f "${TARGET}.new" "$TARGET"
 
 echo "m1n1 updated at ${TARGET}"
