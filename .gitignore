@@ -2,4 +2,5 @@ build
 /asahi-scripts-*\.src\.rpm
 /asahi-scripts-*\.tar\.gz
 /asahi-scripts\.spec
-/update-m1n1.sysconfig
+/15-update-m1n1\.install
+/update-m1n1\.sysconfig
