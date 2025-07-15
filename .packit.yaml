@@ -8,7 +8,7 @@ files_to_sync:
 
 actions:
   # Fetch the specfile from Rawhide, disable rpmautospec and download config
-  post-upstream-clone: "bash -c \"curl -s https://src.fedoraproject.org/rpms/asahi-scripts/raw/main/f/asahi-scripts.spec | sed -e '/^%autochangelog$/d' > asahi-scripts.spec && curl -s --remote-name https://src.fedoraproject.org/rpms/asahi-scripts/raw/main/f/update-m1n1.sysconfig\""
+  post-upstream-clone: "bash -c \"curl -s https://src.fedoraproject.org/rpms/asahi-scripts/raw/main/f/asahi-scripts.spec | sed -e '/^%autochangelog$/d' > asahi-scripts.spec && curl -s --remote-name https://src.fedoraproject.org/rpms/asahi-scripts/raw/main/f/15-update-m1n1.install && curl -s --remote-name https://src.fedoraproject.org/rpms/asahi-scripts/raw/main/f/update-m1n1.sysconfig\""
 
 srpm_build_deps:
   - bash
