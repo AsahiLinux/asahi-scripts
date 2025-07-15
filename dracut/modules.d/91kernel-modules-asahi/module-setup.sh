@@ -30,7 +30,9 @@ installkernel() {
         gpio_macsmc
 
     # For RTC
-    hostonly='' instmods rtc-macsmc simple-mfd-spmi spmi-apple-controller nvmem_spmi_mfd
+    hostonly='' instmods rtc-macsmc spmi-apple-controller apple_nvmem_spmi
+    # pre upstream spmi nvmem, delete with 6.16 + 1 release
+    hostonly='' instmods simple-mfd-spmi nvmem_spmi_mfd
 
     # For HID
     hostonly='' instmods spi-apple spi-hid-apple spi-hid-apple-of
