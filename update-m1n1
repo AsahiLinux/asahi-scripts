@@ -24,6 +24,12 @@ if [ -z "$DTBS" ]; then
     exit 1
 fi
 
+# If ${DTBS} is a directory expand it to include dtbs from all Apple silicon
+# macs.
+if [ -d "$DTBS" ]; then
+    DTBS="${DTBS}/apple/t6*.dtb ${DTBS}/apple/t81*.dtb"
+fi
+
 umount=false
 
 m1n1config=/run/m1n1.conf
