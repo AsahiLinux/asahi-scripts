@@ -72,9 +72,11 @@ EOF
 # Check pipewire profile
 check_macaudio_profile() {
     local profile_config="${HOME}/.local/state/wireplumber/default-profile"
+    set -o pipefail
     [ -e  ${profile_config} ] \
     && sed -ne 's/^alsa_card.platform-sound=// p' ${profile_config} | grep . \
     || echo "Default"
+    set +o pipefail
 }
 macaudio_profile=$(check_macaudio_profile)
 
