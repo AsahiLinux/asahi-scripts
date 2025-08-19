@@ -111,16 +111,6 @@ check_audio_macaudio() {
 }
 bad_macaudio_params=$(check_audio_macaudio)
 
-# Check that snd-soc-tas2764.apple_quirks=0x3f is being applied
-check_audio_tas2764() {
-    [ -e /sys/module/snd_soc_tas2764/ ] && (
-        grep "63" /sys/module/snd_soc_tas2764/parameters/apple_quirks > /dev/null \
-        && echo "yes" \
-        || echo "no"
-    ) || echo "N/A"
-}
-tas2764_quirks=$(check_audio_tas2764)
-
 audio_config() {
     cat <<EOF
 ## Audio Configuration:
@@ -129,7 +119,6 @@ audio_config() {
     Old configuration files in \`/etc/\`: $old_conf
     File conflicts in \`/usr/share/\`: $racy_build
     Speaker detonation requested: $bad_macaudio_params
-    TAS2764 quirks applied: $tas2764_quirks
 
 EOF
 }
@@ -256,8 +245,7 @@ diagnose() {
     if [ "$pro_audio" = "yes" ] || \
        [ "$old_conf" = "yes" ] || \
        [ "$racy_build" = "yes" ] || \
-       [ "$bad_macaudio_params" = "yes" ] || \
-       [ "$tas2764_quirks" = "no" ]; then
+       [ "$bad_macaudio_params" = "yes" ]; then
         echo
         echo "!! IMPORTANT !!"
         echo "Your audio configuration is in an invalid state. It is likely that you tried to"
@@ -268,7 +256,6 @@ diagnose() {
             [ "$old_conf" = "yes" ] && echo "    - You have files in /etc/ from a prerelease version of asahi-audio."
             [ "$racy_build" = "yes" ] && echo "    - You have files in /usr/share/ from a prerelease version of asahi-audio."
             [ "$bad_macaudio_params" = "yes" ] && echo "    - You have tried to manually circumvent our kernel-level safety controls."
-            [ "$tas2764_quirks" = "no" ] && echo "    - Required speaker codec settings are not being applied."
         )
         echo "Please go to https://asahilinux.org/docs/sw/undoing-early-speaker-hacks/ for fixes."
         echo "Do NOT file audio-related bugs until you have tried ALL fixes suggested at the page above."
