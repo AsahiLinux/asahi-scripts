@@ -30,7 +30,7 @@ install: all
 	install -dD $(DESTDIR)/etc
 	install -dD $(DESTDIR)$(PREFIX)/share/asahi-scripts
 	install -m0644 -t $(DESTDIR)$(PREFIX)/share/asahi-scripts functions.sh
-	install -dD $(DESTDIR)/$(SYS_PREFIX)/lib/firmware/vendor
+	install -dD $(DESTDIR)$(SYS_PREFIX)/lib/firmware/vendor
 
 install-mkinitcpio: install
 	install -dD $(DESTDIR)$(PREFIX)/lib/initcpio/install
