@@ -68,61 +68,6 @@ system_info() {
 EOF
 }
 
-
-# Check pipewire profile
-check_macaudio_profile() {
-    local profile_config="${HOME}/.local/state/wireplumber/default-profile"
-    [ -e  ${profile_config} ] \
-    && sed -ne 's/^alsa_card.platform-sound=// p' ${profile_config} | grep . \
-    || echo "Default"
-}
-macaudio_profile=$(check_macaudio_profile)
-
-# Check for the Pro Audio profile (installed before early 2023)
-check_proaudio() {
-    grep "alsa_output.platform-sound.pro-output.." "${HOME}/.local/state/wireplumber/restore-stream" > /dev/null \
-    && echo "yes" \
-    || echo "no"
-}
-pro_audio=$(check_proaudio)
-
-# Check for Configs in /etc/ (installed before mid 2023)
-check_audio_oldconfs() {
-    [ -e /etc/pipewire/pipewire.conf.d/*asahi* ] \
-    || [ -e /etc/wireplumber/policy.lua.d/99-asahi-policy.lua ] \
-    && echo "yes" \
-    || echo "no"
-}
-old_conf=$(check_audio_oldconfs)
-
-# Check for the racy 99-asahi* build (installed before ~Oct 2023)
-check_audio_oldbuild() {
-    [ -e /usr/share/wireplumber/policy.lua.d/99-asahi-policy.lua ] \
-    && echo "yes" \
-    || echo "no"
-}
-racy_build=$(check_audio_oldbuild)
-
-# Check if snd-soc-macaudio.please_blow_up_my_speakers was requested
-check_audio_macaudio() {
-    grep "0" /sys/module/snd_soc_macaudio/parameters/please_blow_up_my_speakers > /dev/null \
-    && echo "no" \
-    || echo "yes"
-}
-bad_macaudio_params=$(check_audio_macaudio)
-
-audio_config() {
-    cat <<EOF
-## Audio Configuration:
-    Default profile: $macaudio_profile
-    Pro Audio profile detected: $pro_audio
-    Old configuration files in \`/etc/\`: $old_conf
-    File conflicts in \`/usr/share/\`: $racy_build
-    Speaker detonation requested: $bad_macaudio_params
-
-EOF
-}
-
 getfile() {
     cat <<EOF
 ## $2
@@ -219,7 +164,6 @@ diagnose() {
         firmware_versions
         boot_config
         system_info
-        audio_config
         environment
         getfile /proc/mounts "Mounts"
         package_versions
@@ -235,33 +179,6 @@ diagnose() {
     )
 
     log "Saved diagnostic information to $f"
-
-    if [ "$macaudio_profile" != "HiFi" -a "$macaudio_profile" != "Default" ]; then
-        echo
-        echo "Pipewire macaudio profile is \"${macaudio_profile}\"."
-        echo "Headphones and speakers will not work. Select the \"Default\" or \"HiFi\" profile."
-    fi
-
-    if [ "$pro_audio" = "yes" ] || \
-       [ "$old_conf" = "yes" ] || \
-       [ "$racy_build" = "yes" ] || \
-       [ "$bad_macaudio_params" = "yes" ]; then
-        echo
-        echo "!! IMPORTANT !!"
-        echo "Your audio configuration is in an invalid state. It is likely that you tried to"
-        echo "enable speakers early, despite numerous and very explicit warnings not to do so."
-        echo "Potential reason(s) you are seeing this message: "
-        (
-            [ "$pro_audio" = "yes" ] && echo "    - The Pro Audio profile is/was enabled for the internal speakers."
-            [ "$old_conf" = "yes" ] && echo "    - You have files in /etc/ from a prerelease version of asahi-audio."
-            [ "$racy_build" = "yes" ] && echo "    - You have files in /usr/share/ from a prerelease version of asahi-audio."
-            [ "$bad_macaudio_params" = "yes" ] && echo "    - You have tried to manually circumvent our kernel-level safety controls."
-        )
-        echo "Please go to https://asahilinux.org/docs/sw/undoing-early-speaker-hacks/ for fixes."
-        echo "Do NOT file audio-related bugs until you have tried ALL fixes suggested at the page above."
-        echo "Your bugs will be ignored and you will not be assisted."
-    fi
-
 
     plat="$(cat /proc/device-tree/compatible | sed -re 's/.*apple,(t....).*/\1/g')"
     ver="$(tr -d '\0' </proc/device-tree/chosen/asahi,os-fw-version)"
