@@ -59,7 +59,7 @@ if [ -z "$TARGET" ]; then
 fi
 
 cat "$M1N1" $DTBS >"${TARGET}.new"
-gzip -c "$U_BOOT" >>"${TARGET}.new"
+gzip -nc "$U_BOOT" >>"${TARGET}.new"
 cat "$m1n1config" >>"${TARGET}.new"
 
 if [ -e "$TARGET" ]; then
