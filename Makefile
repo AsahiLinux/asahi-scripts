@@ -51,8 +51,8 @@ install-dracut: install
 install-macsmc-battery: install
 	install -dD $(DESTDIR)$(SYSTEMD_UNIT_DIR)
 	install -dD $(DESTDIR)$(UDEV_RULES_DIR)
-	install -m0755 -t $(DESTDIR)$(SYSTEMD_UNIT_DIR) macsmc-battery/systemd/macsmc-battery-charge-control-end-threshold.path
-	install -m0755 -t $(DESTDIR)$(SYSTEMD_UNIT_DIR) macsmc-battery/systemd/macsmc-battery-charge-control-end-threshold.service
+	install -m0644 -t $(DESTDIR)$(SYSTEMD_UNIT_DIR) macsmc-battery/systemd/macsmc-battery-charge-control-end-threshold.path
+	install -m0644 -t $(DESTDIR)$(SYSTEMD_UNIT_DIR) macsmc-battery/systemd/macsmc-battery-charge-control-end-threshold.service
 	install -m0644 -t $(DESTDIR)$(UDEV_RULES_DIR) macsmc-battery/udev/93-macsmc-battery-charge-control.rules
 
 install-udev-hwdb: install
