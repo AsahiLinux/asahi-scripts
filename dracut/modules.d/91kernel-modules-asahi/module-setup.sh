@@ -14,16 +14,22 @@ installkernel() {
     # SMC core
     hostonly='' instmods macsmc macsmc-rtkit
 
+    # SMC input, reboot, power for power button in the initramfs
+    hostonly='' instmods macsmc-input macsmc-power macsmc-reboot
+
     # For USB
     hostonly='' instmods \
-        i2c-apple \
         i2c-pasemi-platform \
         tps6598x \
+        sn201202x \
         apple-dart \
         dwc3 \
+        dwc3-apple \
         dwc3-of-simple \
         nvmem-apple-efuses \
         phy-apple-atc \
+        reset-apple-cio \
+        thunderbolt_apple \
         xhci-plat-hcd \
         xhci-pci \
         pcie-apple \
