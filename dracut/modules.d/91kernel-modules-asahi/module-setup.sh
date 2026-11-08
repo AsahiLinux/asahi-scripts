@@ -16,7 +16,6 @@ installkernel() {
 
     # For USB
     hostonly='' instmods \
-        i2c-apple \
         i2c-pasemi-platform \
         tps6598x \
         apple-dart \
