@@ -25,6 +25,8 @@ installkernel() {
         dwc3-of-simple \
         nvmem-apple-efuses \
         phy-apple-atc \
+        reset-apple-cio \
+        thunderbolt_apple \
         xhci-plat-hcd \
         xhci-pci \
         pcie-apple \
