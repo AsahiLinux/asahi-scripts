@@ -14,6 +14,9 @@ installkernel() {
     # SMC core
     hostonly='' instmods macsmc macsmc-rtkit
 
+    # SMC input, reboot, power for power button in the initramfs
+    hostonly='' instmods macsmc-input macsmc-power macsmc-reboot
+
     # For USB
     hostonly='' instmods \
         i2c-pasemi-platform \
